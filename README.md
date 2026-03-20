@@ -94,3 +94,66 @@ Variable, proxy de :
 - pesticides_tonnes : intensité agricole
 
 Les variables utilisées dans le modèle sont des proxies permettant d’approcher des phénomènes agronomiques complexes, tels que la disponibilité en eau ou la fertilité du sol.
+
+2. Fichiers présents dans Crop Yield Prediction Dataset
+
+### Fichier pesticides.csv
+
+On retrouve dans ce fichier l'utilisation en tonne de pestice par pays et par année.
+
+Après analyse du fichier :
+- Pas de doublons
+- Pas de valeurs manquantes
+- Présence de valeurs extrêmes
+
+La présence de valeur extrême est expliqué par un gros écart entre les gros utilisateurs de pesticide et les petits utilisateurs.
+**Le top 5 des plus gros utilisateurs de pesticide représente 66% de la valeur globale.**
+
+### Fichier rainfall.csv
+
+On retrouve dans ce fichier les précipitations en mm par pays et par année.
+
+Après analyse du fichier :
+- Pas de doublons
+- + de 11% de valeurs manquantes dans la variable des précipitations.
+- Identification de 25 pays sans valeur, sans aucune valeur par année.
+- **Choix d'imputer par la moyenne global les pays pour ne pas perdre trop de données.**
+
+### Fichier temp.csv
+
+On retrouve dans ce fichier les températures moyennes par pays et par année.
+
+Après analyse du fichier :
+- Doublons trouvés
+- 3% de données manquantes pour la variable température
+
+Les valeurs manquantes se trouvent dans des dates très anciennes donc on fait le choix de garder uniquement les données supérieur à 1900.
+
+Concernant les doublons, on voit que nous avons plusieurs températures pour la même année sur certains pays.
+- On décide alors de faire la moyenne par année, par pays des températures pour ne pas avoir ces doublons suspects.
+
+### Fichier yield.csv
+
+On retouve dans ce fichier un dataset central par pays, par année, par type de culture ainsi que les valeurs de rendements.
+Ce fichier comporte plus de données que les 2 autres datasets et il serait intéressant de les consolider avec ce fichier.
+
+Distribution de la variable de rendement :
+
+![alt text](notebooks/graph/distribution_variable_cible_fichier_yield.png)
+
+On voit un étalement vers la gauche. Les données se suivent pas une distribution quasi normale comme le premier dataset. Le fichier est plus déséquilibré.
+
+### Fichier yield_df.csv
+
+On retouve dans ce fichier un dataset déjà consolidé entre yield et les 3 fichiers concernant les conditions météos.
+
+Après analyse du fichier :
+- Difficulté de savoir comment a été traité le fichier
+- Pas de valeurs manquantes
+- Doublons trouvés sur les températures notamment.
+
+Pour une meilleure analyse, nous allons consolider un nouveau fichier yield_df.
+
+### Nouveau fichier consolidé :
+
+
