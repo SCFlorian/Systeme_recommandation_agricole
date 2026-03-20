@@ -9,9 +9,11 @@ notebook_analyse_exploratoire copy.ipynb
 notebook_pca.ipynb
 
 # Dossier
-scripts/
 .vscode
 
 # Annexe
 .DS_Store
 poetry.lock
+
+# Cache
+__pycache__
