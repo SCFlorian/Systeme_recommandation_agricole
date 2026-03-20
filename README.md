@@ -44,3 +44,53 @@ Notre distribution ressemble à une cloche, donc à une distribution normale mê
 
 - On retrouve également quelques valeurs aberrantes sur notre variable cible. On peut voir des rendements négatifs donc nous avons décidé de les suppirmer car cela concerne uniquement 231 lignes sur les 1 million.
 - Afin de préparer le fichier pour l'ACP, on décide de mettre les variables **Fertilizer_Used** et **Irrigation_Used** en numérique (0 ou 1 car les valeurs étaient True or False).
+
+#### Analyse des composantes principales
+
+Étant donnée que nous avons beaucoup de données dans ce fichier, nous allons utiliser la méthode ACP pour nous permettre d'aller un peu plus loin dans l'analyse exploratoire.
+
+- Réduction des dimensions :
+
+Nos variables sont indépendantes, ce qui nous permet de pouvoir avoir une bonne réduction des dimensions. Nous avons étudié avec 5 composantes principales, elles sont autour des 10% pour chaque.
+
+- Identification des variables clés :
+    - **Même si l’ACP ne réduit pas beaucoup la dimension, elle reste très utile pour comprendre les relations.**
+    - PC1 :
+        - conditions/intensité de croissance plus fortes” vs “cycle plus long
+    - PC2 :
+        - PC2 est surtout un axe lié à la pluie, opposé à un bloc de variables agricoles/cycle
+    - PC3 :
+        - irrigation vs température
+    - PC4 :
+        - fertilisation et autres conditions de croissance
+    - PC5 : 
+        - cycle plus long et environnement plus humide
+
+- Cercle de corrélation :
+
+![alt text](notebooks/graph/cercle_correlation.png)
+
+- Les variables alignées, elles pointent dans la même direction :
+    - Fertilizer_Used
+    - Temperature_Celsius
+    - Irrigation_Used
+    - Ces variables sont positivement corrélées entre elles
+- Variable opposée : Days_to_Harvest est négativement correlé avec celles du dessus
+    - plus d’engrais / température / irrigation = moins de jours jusqu’à récolte
+- Variable isolée :
+    - Rainfall : Rainfall est faiblement corrélée aux autres variables
+
+- 3 dimensions réelles : intensité agricole / durée de culture / conditions climatiques
+
+### Proxy
+
+Un proxy est une variable qui remplace quelque chose qu'il ne peut pas être mesuré directement.
+
+Variable, proxy de :
+- Rainfall_mm : disponibilité en eau
+- Irrigation_Used : gestion de l’eau
+- Fertilizer_Used : fertilité du sol
+- Temperature_Celsius : conditions climatiques
+- pesticides_tonnes : intensité agricole
+
+Les variables utilisées dans le modèle sont des proxies permettant d’approcher des phénomènes agronomiques complexes, tels que la disponibilité en eau ou la fertilité du sol.
