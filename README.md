@@ -156,4 +156,39 @@ Pour une meilleure analyse, nous allons consolider un nouveau fichier yield_df.
 
 ### Nouveau fichier consolidé :
 
+Avant de pouvoir étudier correctement les relations entre les différentes conditions météoroliques, nous devons consilider les fichiers suivants :
+- yield.csv
+- pesticides.csv
+- rainfall.csv
+- temp.csv
 
+Le fichier central est yield, nous allons donc faire des jointures sur ce fichier.
+Il y a plusieurs problématiques :
+- Pas exactement les mêmes noms pour tous les pays
+- Un nombre d'années différent entre les fichiers
+- Impact potentiel, un nombre de NaN conséquent pour certains pays et certaines années.
+
+Choix méthodoliques :
+
+- On a identifié quelques pays avec des noms mal orthographiés, on change les noms, il y a sûrement quelques trous dans la raquette..
+- On prend uniquement un certain nombre d'année pour être cohérent. Dans yield on ve retenir que les années supérieures à 1990 jusqu'aux années les plus récentes.
+- Après la fusion des datasets, on fait le choix d'une imputation par la moyenne pour éviter de supprimer trop facilement des données.
+    - Imputation par année et par pays. Si un pays a déjà des données pour une année, on va prendre cette moyenne.
+    - Imputation par la moyenne sur l'ensemble des données si pas de moyenne du tout.
+(Matrice de corrélation dans le notebook)
+
+- Premiers résulats :
+
+    - On note une corrélation assez forte entre les températures moyennes et les précipitations
+    - Avec la valeur cible c'est la valeur des pesticides qui a un lien + fort que les autres
+    - Relation négative entre les températures et les pesticides ainsi qu'entre les rendements et les températures
+
+### Comparaison ACP vs dataset prediction
+
+L’ACP montre que la variance est répartie de manière homogène entre les composantes, ce qui indique l’absence de structure dominante et de fortes corrélations entre les variables explicatives.
+La matrice de corrélation confirme ce constat, avec des coefficients globalement faibles, traduisant des relations linéaires limitées entre variables, ainsi qu’avec la variable cible.
+
+Il n'y a de relation directe entre notre premier dataset (celui pour l'ACP) et les autres datasets.
+- Le premier fichier est par grande région et culture
+- Le deuxième fichier est par pays, par année puis par culture
+- Le rapprochement des données serait très bancal.
