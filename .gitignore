@@ -1,0 +1,17 @@
+# Fichiers à ignorer
+
+# CSV
+crop_yield.csv
+yield_df.csv
+
+# Notebooks
+notebook_analyse_exploratoire copy.ipynb
+notebook_pca.ipynb
+
+# Dossier
+scripts/
+.vscode
+
+# Annexe
+.DS_Store
+poetry.lock
