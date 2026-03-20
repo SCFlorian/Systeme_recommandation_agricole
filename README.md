@@ -1,9 +1,9 @@
 # Système de recommandation agricole
 ## Sommaire
 
-[Présentation](#présentation)
-[Organisation](#organisation)
-[Analyse exploratoire des fichiers sources](#analyse-exploratoire-des-fichiers-sources)
+1. [Présentation](#présentation)
+2. [Organisation](#organisation)
+3. [Analyse exploratoire des fichiers sources](#analyse-exploratoire-des-fichiers-sources)
 
 ## Présentation
 
