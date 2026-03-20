@@ -1,7 +1,52 @@
 # Système de recommandation agricole
 ## Sommaire
 
+[Présentation](#présentation)
+[Organisation](#organisation)
 [Analyse exploratoire des fichiers sources](#analyse-exploratoire-des-fichiers-sources)
+
+## Présentation
+
+Ce projet a pour but de réaliser une développer une application web simple et intuitive pour aider les agriculteurs à prendre de meilleurs décisions.
+L'application aura deux fonctions au sein de la même interface :
+
+1. Fonction de prédiction : Permettre à un utilisateur de sélectionner une culture spécifique, de renseigner les conditions de sa parcelle (température, usage de pesticides, etc.) et d'obtenir une estimation chiffrée du rendement attendu.
+
+2. Fonction de recommandation : L'utilisateur renseigne uniquement les conditions de sa parcelle, et l'application lui recommande la culture la plus rentable en simulant le rendement pour toutes les cultures possibles et en affichant un classement.
+
+Nous avons eu à disposition deux datasets :
+- Agriculture Crop Yield.zip
+    - Fichier crop_yield.csv
+- Crop Yield Prediction Dataset.zip
+    - pesticides.csv
+    - rainfall.csv
+    - temp.csv
+    - yield_df.csv
+    - yield.csv
+
+## Organisation
+
+```
+├── data/                                      # Dossier contenant nos fichiers csv bruts et transformés
+│   └── processed/                             # Création des nouveaux fichiers csv 
+│       ├──yield_df_final.csv                
+│   └── raw/                                   # Les éléments de base du projet
+│       ├──crop_yield.csv                      
+│       ├──pesticides.csv                       
+│       ├──rainfall.csv                   
+│       ├──temp.csv                     
+│       ├──yield.csv                   
+├── scripts/                                   # Scripts généraux
+│   ├──config.py                         
+│   ├──data_cleaning.py               
+├── notebooks/                                 # Notebook pour l'analyse des données & dossier graph
+│   ├──notebook_analyse_exploratoire.ipynb
+│   ├──graph                                           
+├── .gitignore                                 # Permet de ne pas afficher les éléments sélectionnés sur GitHub
+├── poetry.lock                                # Pas versionné sur Git
+├── pyproject.toml                             # Gestion des dépendances Poetry
+├── README.md                                  # Documentation du projet
+```
 
 ## Analyse exploratoire des fichiers sources
 
