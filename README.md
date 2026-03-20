@@ -172,11 +172,6 @@ Après analyse du fichier :
 - Doublons trouvés
 - 3% de données manquantes pour la variable température
 
-Les valeurs manquantes se trouvent dans des dates très anciennes donc on fait le choix de garder uniquement les données supérieur à 1900.
-
-Concernant les doublons, on voit que nous avons plusieurs températures pour la même année sur certains pays.
-- On décide alors de faire la moyenne par année, par pays des températures pour ne pas avoir ces doublons suspects.
-
 ### Fichier yield.csv
 
 On retouve dans ce fichier un dataset central par pays, par année, par type de culture ainsi que les valeurs de rendements.
@@ -216,10 +211,10 @@ Il y a plusieurs problématiques :
 Choix méthodoliques :
 
 - On a identifié quelques pays avec des noms mal orthographiés, on change les noms, il y a sûrement quelques trous dans la raquette..
-- On prend uniquement un certain nombre d'année pour être cohérent. Dans yield on ve retenir que les années supérieures à 1990 jusqu'aux années les plus récentes.
-- Après la fusion des datasets, on fait le choix d'une imputation par la moyenne pour éviter de supprimer trop facilement des données.
-    - Imputation par année et par pays. Si un pays a déjà des données pour une année, on va prendre cette moyenne.
-    - Imputation par la moyenne sur l'ensemble des données si pas de moyenne du tout.
+- On prend uniquement un certain nombre d'année pour être cohérent. Dans yield on ve retenir que les années à partir des années 1990 jusqu'aux années les plus récentes.
+- Après la fusion des datasets, on fait le choix d'une imputation par la médiane pour éviter de supprimer trop facilement des données.
+    - Imputation par pays ou par culture. Si un pays a déjà des données pour une année, on va prendre cette moyenne.
+    - Imputation par la médiane sur l'ensemble des données si pas de moyenne du tout.
 (Matrice de corrélation dans le notebook)
 
 - Premiers résulats :
