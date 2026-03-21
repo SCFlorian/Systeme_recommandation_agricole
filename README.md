@@ -223,6 +223,10 @@ Choix méthodoliques :
     - Avec la valeur cible c'est la valeur des pesticides qui a un lien + fort que les autres
     - Relation négative entre les températures et les pesticides ainsi qu'entre les rendements et les températures
 
+### Matrice corrélation
+
+![alt text](notebooks/graph/matrice_correlation_spearman.png)
+
 ### Comparaison ACP vs dataset prediction
 
 L’ACP montre que la variance est répartie de manière homogène entre les composantes, ce qui indique l’absence de structure dominante et de fortes corrélations entre les variables explicatives.
