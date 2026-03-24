@@ -3,6 +3,7 @@
 # CSV
 crop_yield.csv
 yield_df.csv
+harmonization_data/
 
 # Notebooks
 notebook_analyse_exploratoire copy.ipynb
