@@ -9,6 +9,7 @@ harmonization_data/
 notebook_analyse_exploratoire copy.ipynb
 notebook_pca.ipynb
 notebook_analyse_exploratoire_old.ipynb
+notebook_feature_engineering.ipynb
 
 # Dossier
 .vscode
