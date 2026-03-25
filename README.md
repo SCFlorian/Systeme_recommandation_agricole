@@ -4,6 +4,7 @@
 1. [Présentation](#présentation)
 2. [Organisation](#organisation)
 3. [Analyse exploratoire des fichiers sources](#analyse-exploratoire-des-fichiers-sources)
+4. [Enrichissement du fichier consolidé](#enrichissement-du-fichier-consolidé)
 
 ## Présentation
 
@@ -39,8 +40,9 @@ Nous avons eu à disposition deux datasets :
 ├── scripts/                                   # Scripts généraux
 │   ├──config.py                         
 │   ├──data_cleaning.py               
-├── notebooks/                                 # Notebook pour l'analyse des données & dossier graph
+├── notebooks/                                 # Notebook & dossier graph
 │   ├──notebook_analyse_exploratoire.ipynb
+│   ├──notebook_feature_engineering.ipynb
 │   ├──graph                                           
 ├── .gitignore                                 # Permet de ne pas afficher les éléments sélectionnés sur GitHub
 ├── poetry.lock                                # Pas versionné sur Git
@@ -62,11 +64,11 @@ Nous avons eu à disposition deux datasets :
 
 La première chose réalisée a été l'analyse exploratoire de l'ensemble des fichiers.
 
-### 1. Fichier identifié comme source principale pour la modélisation : crop_yield.csv
+### 1. Fichier crop_yield.csv
 
 #### Description
 
-On retrouve des informations cruciales pour le projet :
+On retrouve des informations importantes :
 - Type de culture : riz, coton etc
 - Grande région : west, south etc
 - Conditions climatiques :
@@ -77,13 +79,16 @@ On retrouve des informations cruciales pour le projet :
 - Type d'utilisation agricole :
     - utilisation de fertilisant
     - utilisation d'irrigation
-- **Variable cible** : le rendement en tonne par hectare -> variable recherchée par le modèle
+- **Variable cible** : le rendement en tonne par hectare -> variable cible
+- On retrouve 10 colonnes pour 1 million de lignes
+- Le fichier semble avoir des données synthétiques
 
 La distibution de notre variable cible :
 
 ![alt text](notebooks/graph/distribution_variable_cible.png)
 
 Notre distribution ressemble à une cloche, donc à une distribution normale même si on ne peut pas la considérer comme telle car on voit quelques petits dépassements.
+
 
 #### Nettoyage
 
@@ -96,7 +101,7 @@ Notre distribution ressemble à une cloche, donc à une distribution normale mê
 
 - Réduction des dimensions :
 
-Nos variables sont indépendantes, ce qui nous permet de pouvoir avoir une bonne réduction des dimensions. Nous avons étudié avec 5 composantes principales, elles sont autour des 10% pour chaque.
+Nos variables sont indépendantes, ce qui nous ne permet pas de réaliser une bonne réduction des dimensions. Nous avons étudié avec 5 composantes principales, elles sont autour des 20% pour chaque.
 
 - Identification des variables clés :
     - **Même si l’ACP ne réduit pas beaucoup la dimension, elle reste très utile pour comprendre les relations.**
@@ -119,7 +124,6 @@ Nos variables sont indépendantes, ce qui nous permet de pouvoir avoir une bonne
     - Fertilizer_Used
     - Temperature_Celsius
     - Irrigation_Used
-    - Ces variables sont positivement corrélées entre elles
 - Variable opposée : Days_to_Harvest est négativement correlé avec celles du dessus
     - plus d’engrais / température / irrigation = moins de jours jusqu’à récolte
 - Variable isolée :
@@ -132,13 +136,17 @@ Nos variables sont indépendantes, ce qui nous permet de pouvoir avoir une bonne
 Un proxy est une variable qui remplace quelque chose qu'il ne peut pas être mesuré directement.
 
 Variable, proxy de :
-- Rainfall_mm : disponibilité en eau
 - Irrigation_Used : gestion de l’eau
 - Fertilizer_Used : fertilité du sol
-- Temperature_Celsius : conditions climatiques
-- pesticides_tonnes : intensité agricole
 
 Les variables utilisées dans le modèle sont des proxies permettant d’approcher des phénomènes agronomiques complexes, tels que la disponibilité en eau ou la fertilité du sol.
+
+On réalise alors que nous allons se servir des éléments que nous avons ici pour enrichir notre futur fichier pour la modélisation. Voici les éléments que nous chercherons à ajouter :
+
+- Irrigation_Used
+- Fertilizer_Used
+- Weather_Condition
+- Soil_Type
 
 2. Fichiers présents dans Crop Yield Prediction Dataset
 
@@ -154,6 +162,8 @@ Après analyse du fichier :
 La présence de valeur extrême est expliqué par un gros écart entre les gros utilisateurs de pesticide et les petits utilisateurs.
 **Le top 5 des plus gros utilisateurs de pesticide représente 66% de la valeur globale.**
 
+On a analysé les pays en "écart", rien ne semble anormal, ce sont des pays qui peuvent être des gros utilisateurs.
+
 ### Fichier rainfall.csv
 
 On retrouve dans ce fichier les précipitations en mm par pays et par année.
@@ -162,20 +172,21 @@ Après analyse du fichier :
 - Pas de doublons
 - + de 11% de valeurs manquantes dans la variable des précipitations.
 - Identification de 25 pays sans valeur, sans aucune valeur par année.
-- **Choix d'imputer par la moyenne global les pays pour ne pas perdre trop de données.**
 
 ### Fichier temp.csv
 
 On retrouve dans ce fichier les températures moyennes par pays et par année.
 
 Après analyse du fichier :
-- Doublons trouvés
-- 3% de données manquantes pour la variable température
+- Doublons trouvés : il y a une répétition de plusieurs années par pays.
+- 3% de données manquantes pour la variable température.
+- On retrouve des dates très anciennes, à partir de 1743.
+- Les valeurs de la température vont de -14 à 30 degrès.
 
 ### Fichier yield.csv
 
 On retouve dans ce fichier un dataset central par pays, par année, par type de culture ainsi que les valeurs de rendements.
-Ce fichier comporte plus de données que les 2 autres datasets et il serait intéressant de les consolider avec ce fichier.
+Ce fichier est central et sera donc le fichier à consolidé avec les fichiers des conditions climatiques.
 
 Distribution de la variable de rendement :
 
@@ -192,11 +203,11 @@ Après analyse du fichier :
 - Pas de valeurs manquantes
 - Doublons trouvés sur les températures notamment.
 
-Pour une meilleure analyse, nous allons consolider un nouveau fichier yield_df.
+Pour une meilleure analyse, nous allons consolider un nouveau fichier yield_df car nous ne savons pas comment ce fichier a été construit.
 
 ### Nouveau fichier consolidé :
 
-Avant de pouvoir étudier correctement les relations entre les différentes conditions météoroliques, nous devons consilider les fichiers suivants :
+Avant de pouvoir étudier correctement les relations entre les différentes conditions météoroliques, nous devons consolider les fichiers suivants :
 - yield.csv
 - pesticides.csv
 - rainfall.csv
@@ -210,29 +221,139 @@ Il y a plusieurs problématiques :
 
 Choix méthodoliques :
 
-- On a identifié quelques pays avec des noms mal orthographiés, on change les noms, il y a sûrement quelques trous dans la raquette..
-- On prend uniquement un certain nombre d'année pour être cohérent. Dans yield on ve retenir que les années à partir des années 1990 jusqu'aux années les plus récentes.
-- Après la fusion des datasets, on fait le choix d'une imputation par la médiane pour éviter de supprimer trop facilement des données.
-    - Imputation par pays ou par culture. Si un pays a déjà des données pour une année, on va prendre cette moyenne.
-    - Imputation par la médiane sur l'ensemble des données si pas de moyenne du tout.
-(Matrice de corrélation dans le notebook)
+- Harmonisation des noms de pays pour assurer la compatibilité entre les différentes sources
+- Restriction à la période commune (1990–2016) afin d’éviter des valeurs manquantes excessives, notamment sur les données de température et avoir des années récentes
+- Fusion progressive des datasets en conservant yield.csv comme base principale
+- Création de variables indicatrices de valeurs manquantes pour conserver l’information liée à l’absence de données --> utilisation des quartiles
+- Imputation des valeurs manquantes en fonction des "bins" afin de ne pas imputer des valeurs globales qui pourraient fausser les données
+- Cela va nous permettre de limiter la suppression des données
 
-- Premiers résulats :
+1. Harmonisation du nom des pays
 
-    - On note une corrélation assez forte entre les températures moyennes et les précipitations
-    - Avec la valeur cible c'est la valeur des pesticides qui a un lien + fort que les autres
-    - Relation négative entre les températures et les pesticides ainsi qu'entre les rendements et les températures
+- Extraction de chaque pays uniques dans les 4 fichiers.
+- Envoie des pays à un LLM pour lui demander plusieurs noms possibles par pays
+- Mapping des fichiers avec un nom de pays standardisé
+- Identification d'un doublon supplémentaire grâce à l'harmonisation
 
-### Matrice corrélation
+2. Harmonisation du nom des variables et restriction de la temporalité
+- Ajout de nom de varibale cohérent
+- Temporalité commune : 1990 -> 2016
+    - Avoir en tête que le fichier temp s'arrêtait en 2013
+
+3. Gestion des doublons sur le fichier temp
+
+- Regroupement des pays par année et par pays en effectuant la médiane de la température
+
+4. Fusion des datasets à partir de yield
+- Merge des fichiers un à un
+- Passage à 7 colonnes et 29 151 lignes avec des valeurs manquantes pour les conditions climatiques. Valeurs manquantes
+    - avg_temp -> 0.363521
+    - pesticides_tonnes -> 0.171452
+    - rainfall_mm -> 0.102261
+
+5. Imputation sur les valeurs manquantes
+
+- Création de groupe climatique :
+    - les variables climatiques divisées en quartiles
+    - puis création d'une nouvelle variable avec le type de culture et le numéro de catégorie de chaque variable climatique, exemple : **Wheat_3_2_3**
+- Imputation des NaN en fonction de la nouvelle variable
+
+6. Fichier consolidé
+
+**Matrice corrélation**
 
 ![alt text](notebooks/graph/matrice_correlation_spearman.png)
+
+- On note une corrélation assez forte entre les températures moyennes et les précipitations
+- Avec la valeur cible c'est la valeur des pesticides qui a un lien + fort que les autres
+- Relation négative entre les températures et les pesticides ainsi qu'entre les rendements et les températures
 
 ### Comparaison ACP vs dataset prediction
 
 L’ACP montre que la variance est répartie de manière homogène entre les composantes, ce qui indique l’absence de structure dominante et de fortes corrélations entre les variables explicatives.
 La matrice de corrélation confirme ce constat, avec des coefficients globalement faibles, traduisant des relations linéaires limitées entre variables, ainsi qu’avec la variable cible.
 
+## Enrichissement du fichier consolidé
+
 Il n'y a de relation directe entre notre premier dataset (celui pour l'ACP) et les autres datasets.
 - Le premier fichier est par grande région et culture
 - Le deuxième fichier est par pays, par année puis par culture
 - Le rapprochement des données serait très bancal.
+
+**Mais nous avons identifié des variables proxy qui pourraient enrichir notre dataset :**
+- Irrigation_Used
+- Fertilizer_Used
+- Weather_Condition
+- Soil_Type
+
+Le fichier crop_yield semble être un fichier synthétique :
+- Pas de corrélation entre les variables explicatives
+- Répartition à quasi 50/50 des valeurs pour chaque variables 
+
+Plusieurs méthodes d'enrichissement ont été effectué :
+- Modèle de régression logistique afin de prédire les différentes variables sur le nouveau fichier
+    - Variables explicative : précipitation et température
+    - Après un test, le modèle n'arrive pas à généraliser, les variables explicatives sont indépendantes entre elles, le modèle proposait des réponses aléatoires
+    - Par exemple, la balanced_accuracy était à 0,50 pour le fertilisant et l'irrigation
+- Méthode de stratification par catégorie afin de faire le rapprochement sur le nouveau fichier en utilisation la valeur la plus fréquente (mode())
+    - La mise en place de la stratification était simple (en quartiles)
+    - Le problème est l'utilisation de la valeur fréquente. Quand il y a une valeur qui se démarque, cela fonctionne bien. Cependant sur une égalité, le mode choisit aléatoirement
+- Méthode de sampling conditionnel afin d'attribuer la distribution de crop_yield par culture/clé climatique puis choix statistique de la valeur avec une fonction random
+    - Méthode retenue
+
+### Méthode du sampling conditionnel
+
+- Standardusation des noms des types de culture entre les fichiers
+- Autre problématique : nous avons uniquement 4 cultures en communs entre les 2 fichiers
+
+**Méthode**
+
+1. Construction des groupes
+
+Les données sont segmentées selon :
+- climate_key (quantiles température + pluie)
+- crop (type de culture)
+
+2. Calcul des distributions
+
+Pour chaque variable cible et chaque groupe :
+```
+P(valeur | climate_key, crop)
+```
+
+Exemple :
+```
+Maize + T2_R4 → Fertilizer_Used :
+True  = 70%
+False = 30%
+```
+
+3. Imputation par sampling
+
+Pour chaque valeur manquante :
+- Récupération de la distribution du groupe
+- Tirage aléatoire pondéré :
+```
+np.random.choice(values, p=probabilities)
+```
+
+4. Gestion des cas manquants
+- crop
+- climate_key
+- global
+
+5. Conclusion 
+
+Les avantages ici sont :
+- le respoect des distributions réelles
+- évite les biais
+- conserve la variabilité des données
+
+Les limites sont :
+- que c'est non déterministe
+- que la cohérence individuelle n'est pas garantie
+
+La méthode est validée par :
+- une comapraison des distributions avant / après enrichissement
+- faible écat global
+- absence de biais sur les catégories
