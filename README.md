@@ -355,5 +355,61 @@ Les limites sont :
 
 La méthode est validée par :
 - une comapraison des distributions avant / après enrichissement
-- faible écat global
+- faible écart global
 - absence de biais sur les catégories
+
+Exemple de comparaison par nouvelle variable :
+```
+=== Fertilizer_Used ===
+Source (crop_yield):
+Fertilizer_Used
+False    0.50006
+True     0.49994
+Name: proportion, dtype: float64
+
+Final (yield_df_final):
+Fertilizer_Used
+False    0.501252
+True     0.498748
+Name: proportion, dtype: float64
+
+=== Irrigation_Used ===
+Source (crop_yield):
+Irrigation_Used
+False    0.500509
+True     0.499491
+Name: proportion, dtype: float64
+
+Final (yield_df_final):
+Irrigation_Used
+True     0.503482
+False    0.496518
+Name: proportion, dtype: float64
+```
+Exemple de comparaison par type de culture :
+
+```
+=== Fertilizer_Used par crop ===
+                                        source     final
+                     Fertilizer_Used                    
+Barley               False            0.500741       NaN
+                     True             0.499259       NaN
+Cotton               True             0.500609       NaN
+                     False            0.499391       NaN
+Maize                False            0.501547  0.497063
+                     True             0.498453  0.502937
+Rice                 True             0.500384  0.500473
+                     False            0.499616  0.499527
+Soybean              False            0.500219  0.502883
+                     True             0.499781  0.497117
+Wheat                True             0.501155  0.501368
+                     False            0.498845  0.498632
+Cassava              False                 NaN  0.508120
+                     True                  NaN  0.491880
+Plantains and others False                 NaN  0.506292
+                     True                  NaN  0.493708
+Potatoes             True                  NaN  0.511170
+                     False                 NaN  0.488830
+Sorghum              False                 NaN  0.519462
+                     True                  NaN  0.480538
+```
