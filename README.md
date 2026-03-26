@@ -5,6 +5,7 @@
 2. [Organisation](#organisation)
 3. [Analyse exploratoire des fichiers sources](#analyse-exploratoire-des-fichiers-sources)
 4. [Enrichissement du fichier consolidé](#enrichissement-du-fichier-consolidé)
+5. [Feature engineering sur le fichier enrichi](#feature-engineering-sur-le-fichier-enrichi)
 
 ## Présentation
 
@@ -164,6 +165,13 @@ La présence de valeur extrême est expliqué par un gros écart entre les gros 
 
 On a analysé les pays en "écart", rien ne semble anormal, ce sont des pays qui peuvent être des gros utilisateurs.
 
+**Évolution de l'utilisation des pesticides dans le temps**
+
+![alt text](notebooks/graph/histo_pesticide.png)
+
+- Depuis les années 2000 jusqu'en 2006, on remarque une croissance de l'utilisation des pesticides de manière globale.
+- Une petite en chute en 2009 avec une légère progression ensuite mais depuis 2011, l'utilisation reste constante.
+
 ### Fichier rainfall.csv
 
 On retrouve dans ce fichier les précipitations en mm par pays et par année.
@@ -310,8 +318,19 @@ Le fichier crop_yield semble être un fichier synthétique :
 Plusieurs méthodes d'enrichissement ont été effectué :
 - Modèle de régression logistique afin de prédire les différentes variables sur le nouveau fichier
     - Variables explicative : précipitation et température
-    - Après un test, le modèle n'arrive pas à généraliser, les variables explicatives sont indépendantes entre elles, le modèle proposait des réponses aléatoires
+    - Après un test, le modèle n'arrive pas à généraliser, les variables explicatives sont indépendantes entre elles Les données sont "plates" (sans corrélations fortes), le modèle de ML essayait de trouver une règle là où il n'y en a pas
     - Par exemple, la balanced_accuracy était à 0,50 pour le fertilisant et l'irrigation
+```
+============================================================
+RÉSUMÉ GLOBAL
+============================================================
+target             accuracy   balanced_accuracy   f1_macro   log_loss
+Fertilizer_Used    0.501995   0.501995            0.501987   0.693143
+Irrigation_Used    0.499895   0.499747            0.489134   0.693148
+Weather_Condition  0.334300   0.334245            0.333182   1.098607
+Soil_Type          0.166765   0.166608            0.142119   1.791780
+```
+
 - Méthode de stratification par catégorie afin de faire le rapprochement sur le nouveau fichier en utilisation la valeur la plus fréquente (mode())
     - La mise en place de la stratification était simple (en quartiles)
     - Le problème est l'utilisation de la valeur fréquente. Quand il y a une valeur qui se démarque, cela fonctionne bien. Cependant sur une égalité, le mode choisit aléatoirement
@@ -320,7 +339,7 @@ Plusieurs méthodes d'enrichissement ont été effectué :
 
 ### Méthode du sampling conditionnel
 
-- Standardusation des noms des types de culture entre les fichiers
+- Standardisation des noms des types de culture entre les fichiers
 - Autre problématique : nous avons uniquement 4 cultures en communs entre les 2 fichiers
 
 **Méthode**
@@ -430,3 +449,31 @@ Potatoes             True                  NaN  0.511170
 Sorghum              False                 NaN  0.519462
                      True                  NaN  0.480538
 ```
+
+## Feature engineering sur le fichier enrichi
+
+Nous avons désormais consolidé notre dataset :
+- Une première fois avec 3 variables climatiques puis imputer de manière rigoureuse pour les données manquantes.
+- Une deuxième fois en enrichissant le dataset avec des variables approximatives qui devraient aider notre modèle à mieux généraliser
+
+Nous devons maintenant continuer l'amélioration de nos données en ajoutant des données si possibles,et en transformant nos données pour être compréhensible pour un modèle.
+
+**Nouvelles variables**
+
+- regroupement des pays : regroupement par grande catégorie pour garder une certaine cohérence
+- tech_trend : capte la croissance historique des rendements liée aux innovations technologiques au fil des ans.
+- irrigation_impact : mesure l'importance vitale de l'apport d'eau artificiel, particulièrement élevée lorsque les précipitations naturelles sont insuffisantes.
+- pest_rain_ratio : évalue l'efficacité potentielle des traitements chimiques en tenant compte du risque de lessivage par les fortes pluies.
+- climate_instability : identifie les régions à risque en mesurant la variabilité.
+- relative_tech_intensity : indique si l'effort technologique d'une année spécifique est supérieur ou inférieur à la norme historique du pays concerné.
+
+**Matrice de corrélation**
+
+![alt text](notebooks/graph/matrice_correlation_spearman_conso.png)
+
+Pas relation forte entre nos variables mais on voit que l'ajout des nouvelles variables ne sont pas redondantes avec les features d'origine.
+
+### Encodage des variables catégorielles
+
+Un modèle de machine learning ne peut pas comprendre les valeurs non numériques alors nous devons transformer nos variables catégorielles, quitte à avoir des colonnes supplémentaires.
+
