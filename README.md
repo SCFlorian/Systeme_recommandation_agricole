@@ -477,3 +477,4 @@ Pas relation forte entre nos variables mais on voit que l'ajout des nouvelles va
 
 Un modèle de machine learning ne peut pas comprendre les valeurs non numériques alors nous devons transformer nos variables catégorielles, quitte à avoir des colonnes supplémentaires.
 
+- **Passage des colonnes catégorielles avec One Hot.**
