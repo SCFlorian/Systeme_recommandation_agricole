@@ -260,6 +260,23 @@ Choix méthodoliques :
 
 6. Fichier consolidé
 
+**Tableau final**
+```
+area	    year	item	avg_temp  rainfall_mm	pesticides_tonnes	yield
+Afghanistan	1990	Maize	15.450	  327.0	        1594.50	            7582
+Afghanistan	1991	Maize	14.570	  327.0	        1594.50	            16800
+Afghanistan	1992	Maize	14.350	  327.0	        1594.50	            15000
+Afghanistan	1993	Maize	14.960	  327.0	        1594.50	            16786
+Afghanistan	1994	Maize	14.940	  327.0	        1594.50	            16667
+```
+
+Cet exemple est pertinent :
+
+- On voit des données de température différente par année pour un même pays : les données étaient ainsi dans le fichier temp
+- Pour rainfall les données de base sont répetées par année
+- Pour ce pays en particulier il n'y avait pas d'informations pour les pesticides, ces données ont été imputé
+- On observe bien un rendmeent différent par année pour un même pays
+
 **Matrice corrélation**
 
 ![alt text](notebooks/graph/matrice_correlation_spearman.png)
