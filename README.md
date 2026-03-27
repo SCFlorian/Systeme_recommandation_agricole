@@ -6,6 +6,7 @@
 3. [Analyse exploratoire des fichiers sources](#analyse-exploratoire-des-fichiers-sources)
 4. [Enrichissement du fichier consolidé](#enrichissement-du-fichier-consolidé)
 5. [Feature engineering sur le fichier enrichi](#feature-engineering-sur-le-fichier-enrichi)
+6. [Feature engineering sur le fichier consolidé](#feature-engineering-sur-le-fichier-consolidé)
 
 ## Présentation
 
@@ -478,3 +479,26 @@ Pas relation forte entre nos variables mais on voit que l'ajout des nouvelles va
 Un modèle de machine learning ne peut pas comprendre les valeurs non numériques alors nous devons transformer nos variables catégorielles, quitte à avoir des colonnes supplémentaires.
 
 - **Passage des colonnes catégorielles avec One Hot.**
+
+## Feature engineering sur le fichier consolidé
+
+Afin de s'assurer de la pertinence de l'enrichissement de nos données, on va devoir comparer la modélisation entre le fichier enriché et le fichier consolidé sans enrichissement.
+
+Pour réaliser cela, nous devons effectuer le même feature engineering.
+
+Nous avons désormais consolidé notre dataset :
+- Une première fois avec 3 variables climatiques puis imputer de manière rigoureuse pour les données manquantes.
+- Une deuxième fois en enrichissant le dataset avec des variables approximatives qui devraient aider notre modèle à mieux généraliser
+
+Nous devons maintenant continuer l'amélioration de nos données en ajoutant des données si possibles,et en transformant nos données pour être compréhensible pour un modèle.
+
+**Nouvelles variables**
+
+- regroupement des pays : regroupement par grande catégorie pour garder une certaine cohérence
+- tech_trend : capte la croissance historique des rendements liée aux innovations technologiques au fil des ans.
+- pest_rain_ratio : évalue l'efficacité potentielle des traitements chimiques en tenant compte du risque de lessivage par les fortes pluies.
+- climate_instability : identifie les régions à risque en mesurant la variabilité.
+- relative_tech_intensity : indique si l'effort technologique d'une année spécifique est supérieur ou inférieur à la norme historique du pays concerné.
+
+Sans avoir enrichi notre fichier, on ne peut pas ajouter la variable irrigation_impact qui dépend de Irrigation_Used.
+
