@@ -502,3 +502,24 @@ Nous devons maintenant continuer l'amélioration de nos données en ajoutant des
 
 Sans avoir enrichi notre fichier, on ne peut pas ajouter la variable irrigation_impact qui dépend de Irrigation_Used.
 
+## Comparaison du fichier avec et sans enrichissement sur plusieurs modèles
+
+Afin de voir si les variables rajoutées du fichier synthétique vers le fichier principal ont du sens, on va comparer sur ces 2 fichiers plusieurs modèles de machine learning.
+
+```
+dataset	           model	        n_rows	n_features	cv_rmse_mean  cv_rmse_std	cv_mae_mean	cv_mae_std	cv_r2_mean	cv_r2_std	test_rmse	test_mae	test_r2
+Fichier enrichi	   DummyRegressor   29151	38	        75652.6639	  1271.5658	    55591.4405	612.0935	-0.0007	    0.0003	    73864.1004	54567.1261	-0.0012
+Fichier consolidé  DummyRegressor   29151	24	        75652.6639	  1271.5658	    55591.4405	612.0935	-0.0007	    0.0003	    73864.1004	54567.1261	-0.0012
+Fichier enrichi	   LightGBM	        29151	38	        28195.1980	  830.2414	    17920.1400	314.8971	0.8609	    0.0064	    27703.8593	17454.4365	0.8592
+Fichier consolidé  LightGBM	        29151	24	        27954.8256	  876.4924	    17768.2938	310.4446	0.8633	    0.0071	    27956.1463	17625.7264	0.8566
+Fichier enrichi	   LinearRegression	29151	38	        51310.2734	  1258.0180	    33432.7746	650.7589	0.5397	    0.0096	    50982.7735	33071.1113	0.5230
+Fichier consolidé  LinearRegression	29151	24	        51341.9533	  1271.3610	    33444.5241	675.6013	0.5392	    0.0096	    51047.0116	33133.5267	0.5218
+Fichier enrichi	   RandomForest	    29151	38	        20799.5607	  772.1689	    10226.1873	294.6239	0.9243	    0.0051	    19681.5670	9289.9715	0.9289
+Fichier consolidé  RandomForest	    29151	24	        20383.3497	  855.5534	    9515.7169	295.8420	0.9272	    0.0056	    19686.6864	8720.9609	0.9289
+Fichier consolidé  XGBoost	        29151	24	        22671.0428	  684.7109	    13549.7758	299.5553	0.9101	    0.0046	    22180.2492	12803.4932	0.9097
+Fichier enrichi	   XGBoost	        29151	38	        23464.4425	  536.1863	    14145.8625	277.0853	0.9037	    0.0033	    22706.2423	13230.0410	0.9054
+```
+
+- Sur ces premiers tests on ne voit pas des meilleurs résultats pour le fichier enrichi, les informations rajoutées ne semblent pas apporter quelque chose d'utile pour nos modèles.
+- On voit que le modèle de RandomForest a des meilleurs résulats (sans optimisation des meilleurs paramètres) mais suivi de très près par XGBoost et LightGBM.
+- N'ayant pas une distribution linéaire, on voit que la regression linéraire ne généralise pas.
