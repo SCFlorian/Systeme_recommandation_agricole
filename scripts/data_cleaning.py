@@ -9,7 +9,7 @@ import logging
 # Chemin pour accèder aux éléments du projet
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Imports du projet
-from scripts.config import (csv_yield_conso, csv_yield_enriched)
+from scripts.config import (csv_yield_conso, csv_yield_enriched, csv_file_crop_yield_clean)
 # Configuration du logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -57,6 +57,7 @@ def preparation_yield_df():
     df.columns = df.columns.str.lower().str.replace(" ", "_")
     logging.info(df.head())
     logging.info(df.columns)
+    df.to_csv("data/processed/yield_df_final_conso_encoded.csv")
     return df
 
 # Fichier crop_yield
@@ -96,6 +97,30 @@ def preparation_yield_enriched():
     df.columns = df.columns.str.lower().str.replace(" ", "_")
     logging.info(df.head())
     logging.info(df.columns)
+    df.to_csv("data/processed/yield_df_enriched_encoded.csv")
 
     return df
 
+# Fichier crop_yield pour modélisation
+
+def preparation_crop_yield():
+    """Si jamais on décide de s'en servir pour un modèle, on le prépare à l'encodage"""
+    # On charge le fichier
+    try :
+        df = pd.read_csv(csv_file_crop_yield_clean, index_col=0)
+    except Exception as e:
+        logging.error(f"Erreur critique lors du chargement du fichier : {e}")
+        raise e
+    logging.info(f"Nombre de lignes et de colonnes sans modifs : {df.shape}\n")
+    # On détermine quels sont nos varibales catégorielles et nos variables quantitatives
+    num_cols = df.select_dtypes(include='number').columns
+    cat_cols = df.select_dtypes(include=['str','bool']).columns
+    # Encodage One Hot des variables catégorielles
+    df = pd.get_dummies(df, columns=cat_cols, dtype=float).copy()
+    logging.info(f"Nombre de lignes et de colonnes après feature engineering {df.shape}")
+    logging.info(num_cols)
+    logging.info(cat_cols)
+    logging.info(df.columns)
+    logging.info(df.shape)
+
+    return df

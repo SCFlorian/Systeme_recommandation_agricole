@@ -5,6 +5,7 @@ crop_yield.csv
 yield_df.csv
 harmonization_data/
 yield_df_final_conso.csv
+UNSD — Methodology.csv
 
 # Notebooks
 notebook_analyse_exploratoire copy.ipynb
@@ -24,3 +25,7 @@ poetry.lock
 
 # Cache
 __pycache__
+
+# Scripts
+data_cleaning_global.py
+feature_engineering.py
