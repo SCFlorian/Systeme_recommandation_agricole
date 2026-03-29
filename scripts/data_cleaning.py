@@ -118,9 +118,14 @@ def preparation_crop_yield():
     # Encodage One Hot des variables catégorielles
     df = pd.get_dummies(df, columns=cat_cols, dtype=float).copy()
     logging.info(f"Nombre de lignes et de colonnes après feature engineering {df.shape}")
+    # Nettoyage du nom des variables pour uniformiser
+    df = df.rename(columns={"Yield_tons_per_hectare":"yield"}).copy()
+    df.columns = df.columns.str.lower().str.replace(" ", "_")
     logging.info(num_cols)
     logging.info(cat_cols)
     logging.info(df.columns)
     logging.info(df.shape)
 
     return df
+
+df = preparation_crop_yield()
