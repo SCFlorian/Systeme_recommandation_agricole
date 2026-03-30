@@ -43,9 +43,9 @@ def preparation_yield_df():
     avg_pest_country = df.groupby('area')['pesticides_tonnes'].transform('mean')
     df['relative_tech_intensity'] = df['pesticides_tonnes'] / (avg_pest_country + 1)
     # Suppression de l'année et de l'area
-    df = df.drop(columns={"year","area"}).copy()
+    df = df.drop(columns={"area","year","region_avg_temp","region_avg_rain"}).copy()
     logging.info(f"Nombre de lignes et de colonnes après nouvelles variables et suppression de 2 colonnes : {df.shape}\n")
-    # On détermine quels sont nos varibales catégorielles et nos variables quantitatives
+    # On détermine quels sont nos variables catégorielles et nos variables quantitatives
     num_cols = df.select_dtypes(include='number').columns
     cat_cols = df.select_dtypes(include='str').columns
     logging.info(num_cols)
@@ -112,6 +112,11 @@ def preparation_crop_yield():
         logging.error(f"Erreur critique lors du chargement du fichier : {e}")
         raise e
     logging.info(f"Nombre de lignes et de colonnes sans modifs : {df.shape}\n")
+    # Ajout de deux nouvelles variables
+    # Ratio climatique - indice d'irrigation critique
+    df['irrigation_impact'] = df['Irrigation_Used'].astype(int) / (df['Rainfall_mm'] + 1)
+    # Intensité du cycle
+    df['growth_intensity'] = df['Temperature_Celsius'] / (df['Days_to_Harvest'] + 1)
     # On détermine quels sont nos varibales catégorielles et nos variables quantitatives
     num_cols = df.select_dtypes(include='number').columns
     cat_cols = df.select_dtypes(include=['str','bool']).columns
@@ -125,6 +130,7 @@ def preparation_crop_yield():
     logging.info(cat_cols)
     logging.info(df.columns)
     logging.info(df.shape)
+    df.to_csv("data/processed/crop_yield_conso.csv")
 
     return df
 
