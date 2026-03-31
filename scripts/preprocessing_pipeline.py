@@ -68,6 +68,7 @@ def cross_validation(pipeline, X_train, y_train):
     scoring = {
         "mse": "neg_mean_squared_error",
         "mae": "neg_mean_absolute_error",
+        "mape": "neg_mean_absolute_percentage_error",
         "r2": "r2"
     }
 

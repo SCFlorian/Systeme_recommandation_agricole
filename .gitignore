@@ -36,3 +36,4 @@ feature_engineering.py
 mlruns/
 artifacts/
 mlflow.db
+mlflow.py
