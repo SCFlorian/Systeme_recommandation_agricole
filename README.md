@@ -10,7 +10,7 @@
 
 ## Présentation
 
-Ce projet a pour but de réaliser une développer une application web simple et intuitive pour aider les agriculteurs à prendre de meilleurs décisions.
+Ce projet a pour but de réaliser une application web simple et intuitive pour aider les agriculteurs à prendre de meilleurs décisions.
 L'application aura deux fonctions au sein de la même interface :
 
 1. Fonction de prédiction : Permettre à un utilisateur de sélectionner une culture spécifique, de renseigner les conditions de sa parcelle (température, usage de pesticides, etc.) et d'obtenir une estimation chiffrée du rendement attendu.
@@ -66,7 +66,7 @@ Nous avons eu à disposition deux datasets :
 
 La première chose réalisée a été l'analyse exploratoire de l'ensemble des fichiers.
 
-### 1. Fichier crop_yield.csv
+### Fichier crop_yield.csv
 
 #### Description
 
@@ -84,6 +84,14 @@ On retrouve des informations importantes :
 - **Variable cible** : le rendement en tonne par hectare -> variable cible
 - On retrouve 10 colonnes pour 1 million de lignes
 - Le fichier semble avoir des données synthétiques
+- Valeur unique par variable catégorielle :
+```
+Nombre de valeur unique : Soil_Type: 6
+Nombre de valeur unique : Crop: 6
+Nombre de valeur unique : Fertilizer_Used: 2
+Nombre de valeur unique : Irrigation_Used: 2
+Nombre de valeur unique : Weather_Condition: 3
+```
 
 La distibution de notre variable cible :
 
@@ -94,7 +102,12 @@ Notre distribution ressemble à une cloche, donc à une distribution normale mê
 
 #### Nettoyage
 
-- On retrouve également quelques valeurs aberrantes sur notre variable cible. On peut voir des rendements négatifs donc nous avons décidé de les suppirmer car cela concerne uniquement 231 lignes sur les 1 million.
+- Boxplot pour analyser le type de culture par rapport au rendement.
+
+![alt text](notebooks/graph/boxplot_crop_yield.png)
+
+- On retrouve quelques valeurs aberrantes sur notre variable cible. On peut voir des rendements négatifs donc nous avons décidé de les supprimer car cela concerne uniquement 231 lignes sur les 1 million.
+- Les valeurs "extrêmes" supérieurs sont moins présents et ne présentent pas d'anomalies statistiques.
 - Afin de préparer le fichier pour l'ACP, on décide de mettre les variables **Fertilizer_Used** et **Irrigation_Used** en numérique (0 ou 1 car les valeurs étaient True or False).
 
 #### Analyse des composantes principales
@@ -181,6 +194,30 @@ Après analyse du fichier :
 - Pas de doublons
 - + de 11% de valeurs manquantes dans la variable des précipitations.
 - Identification de 25 pays sans valeur, sans aucune valeur par année.
+```
+Liste des pays avec des valeurs nulles : 
+<StringArray>
+[           'American Samoa',                     'Aruba',
+                   'Bermuda',    'British Virgin Islands',
+            'Cayman Islands',           'Channel Islands',
+                   'Curacao',             'Faroe Islands',
+          'French Polynesia',                 'Gibraltar',
+                 'Greenland',                      'Guam',
+      'Hong Kong SAR, China',               'Isle of Man',
+                    'Kosovo',          'Macao SAR, China',
+                    'Monaco',             'New Caledonia',
+  'Northern Mariana Islands',                'San Marino',
+ 'Sint Maarten (Dutch part)',  'St. Martin (French part)',
+                     'Tonga',  'Turks and Caicos Islands',
+     'Virgin Islands (U.S.)']
+Length: 25, dtype: str
+
+============================
+
+Liste des pays avec au moins une valeur non nulle : 
+        Area  Year average_rain_fall_mm_per_year
+4061  Monaco  1985                            ..
+```
 
 ### Fichier temp.csv
 
@@ -197,11 +234,20 @@ Après analyse du fichier :
 On retouve dans ce fichier un dataset central par pays, par année, par type de culture ainsi que les valeurs de rendements.
 Ce fichier est central et sera donc le fichier à consolidé avec les fichiers des conditions climatiques.
 
-Distribution de la variable de rendement :
+**Distribution de la variable de rendement :**
 
 ![alt text](notebooks/graph/distribution_variable_cible_fichier_yield.png)
 
 On voit un étalement vers la gauche. Les données se suivent pas une distribution quasi normale comme le premier dataset. Le fichier est plus déséquilibré.
+
+**Boxplot par type de culture et rendement :**
+
+![alt text](notebooks/graph/boxplot_yield.png)
+
+- On peut voir quelques valeurs à 0. Difficile de savoir si on les supprime ou non car théoriquement un rendement à 0 c'est possible si les conditions ne sont pas réunies pour une production.
+- On voit une valeur énorme pour Plaintains and more
+    - La valeur extrême date de 1964, nous irons pas dans des dates aussi antérieures donc on l'enlevera par défaut par la suite.
+- On voit un fort déséquilibre entre les types de culture. On peut noter que la catégorie Potatoes semble avoir avoir des rendements plus élevés que les autres. Ce sont des valeurs extrêmes mais pas aberrantes car elles sont réelles alors nous devons les laisser. 
 
 ### Fichier yield_df.csv
 
@@ -233,7 +279,8 @@ Choix méthodoliques :
 - Harmonisation des noms de pays pour assurer la compatibilité entre les différentes sources
 - Restriction à la période commune (1990–2016) afin d’éviter des valeurs manquantes excessives, notamment sur les données de température et avoir des années récentes
 - Fusion progressive des datasets en conservant yield.csv comme base principale
-- Création de variables indicatrices de valeurs manquantes pour conserver l’information liée à l’absence de données --> utilisation des quartiles
+- Ajout de la région par pays afin d'avoir un détail plus fin.
+- Création de variables indicatrices (région/item/condition climatique) de valeurs manquantes pour conserver l’information liée à l’absence de données --> utilisation des quartiles
 - Imputation des valeurs manquantes en fonction des "bins" afin de ne pas imputer des valeurs globales qui pourraient fausser les données
 - Cela va nous permettre de limiter la suppression des données
 
@@ -243,6 +290,18 @@ Choix méthodoliques :
 - Envoie des pays à un LLM pour lui demander plusieurs noms possibles par pays
 - Mapping des fichiers avec un nom de pays standardisé
 - Identification d'un doublon supplémentaire grâce à l'harmonisation
+- **TOTAL : 44 pays uniques ont été harmonisés sur l'ensemble du projet. Exemple pour un fichier :**
+```
+--- Rapport pour Yield ---
+Nombre total de pays uniques : 212
+Nombre de pays modifiés : 28
+Exemples de modifications :
+  - The former Yugoslav Republic of Macedonia -> North Macedonia
+  - Occupied Palestinian Territory -> Palestine
+  - Saint Lucia -> St. Lucia
+  - China, Taiwan Province of -> Taiwan
+  - Cabo Verde -> Cape Verde
+  ```
 
 2. Harmonisation du nom des variables et restriction de la temporalité
 - Ajout de nom de varibale cohérent
@@ -261,10 +320,32 @@ Choix méthodoliques :
     - rainfall_mm -> 0.102261
 
 5. Imputation sur les valeurs manquantes
+- Ensuite nous voulons améliorer la distinction des pays alors nous avons sélectionné un dataset afin d'ajouter les grandes régions par pays
+    - https://unstats.un.org/unsd/methodology/m49/overview/ : dataset sélectionné
+    - Pour cela nous devons faire matcher encore une fois le noms des pays avec le dataset, nous devons modifier "à la main" 37 pays qui ne correspondaient pas
+    - Exemple de région :
+
+```
+    Sub-region Name                  area                           
+Australia and New Zealand        Australia                          189
+                                 New Zealand                        108
+Central Asia                     Kazakhstan                         150
+                                 Kyrgyzstan                         150
+                                 Tajikistan                         149
+                                 Turkmenistan                       100
+                                 Uzbekistan                         125
+Eastern Asia                     China                              216
+                                 Hong Kong                           47
+                                 Japan                              189
+                                 Mongolia                            54
+                                 North Korea                        189
+                                 South Korea                        189
+                                 Taiwan                             216
+```
 
 - Création de groupe climatique :
     - les variables climatiques divisées en quartiles
-    - puis création d'une nouvelle variable avec le type de culture et le numéro de catégorie de chaque variable climatique, exemple : **Wheat_3_2_3**
+    - puis création d'une nouvelle variable avec la région, le type de culture et le numéro de catégorie de chaque variable climatique, exemple : **Central Asia_Wheat_3_2_3**
 - Imputation des NaN en fonction de la nouvelle variable
 
 6. Fichier consolidé
@@ -482,7 +563,7 @@ Un modèle de machine learning ne peut pas comprendre les valeurs non numérique
 
 ## Feature engineering sur le fichier consolidé
 
-Afin de s'assurer de la pertinence de l'enrichissement de nos données, on va devoir comparer la modélisation entre le fichier enriché et le fichier consolidé sans enrichissement.
+Afin de s'assurer de la pertinence de l'enrichissement de nos données, on va devoir comparer la modélisation entre le fichier enrichi et le fichier consolidé sans enrichissement.
 
 Pour réaliser cela, nous devons effectuer le même feature engineering.
 
@@ -501,6 +582,12 @@ Nous devons maintenant continuer l'amélioration de nos données en ajoutant des
 - relative_tech_intensity : indique si l'effort technologique d'une année spécifique est supérieur ou inférieur à la norme historique du pays concerné.
 
 Sans avoir enrichi notre fichier, on ne peut pas ajouter la variable irrigation_impact qui dépend de Irrigation_Used.
+
+### Encodage des variables catégorielles
+
+Un modèle de machine learning ne peut pas comprendre les valeurs non numériques alors nous devons transformer nos variables catégorielles, quitte à avoir des colonnes supplémentaires.
+
+- **Passage des colonnes catégorielles avec One Hot.**
 
 ## Comparaison du fichier avec et sans enrichissement sur plusieurs modèles
 
