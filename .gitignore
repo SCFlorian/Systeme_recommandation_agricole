@@ -17,6 +17,7 @@ notebook_feature_engineering copy 3.ipynb
 notebook_modelisation copy.ipynb
 notebooks/notebook_modelisation copy 2.ipynb
 notebooks/yield_df_cleaned_final.csv
+notebook_modelisation copy 3.ipynb
 
 # Dossier
 .vscode
@@ -37,3 +38,4 @@ mlruns/
 artifacts/
 mlflow.db
 mlflow.py
+feature_importance_random_forest.csv
