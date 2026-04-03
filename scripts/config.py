@@ -13,3 +13,6 @@ csv_temp = "data/raw/temp.csv"
 csv_yield = "data/raw/yield.csv"
 csv_yield_enriched = "data/processed/yield_df_enriched.csv"
 csv_yield_conso_encoded = "data/processed/yield_df_final_conso_encoded.csv"
+
+FEATURES_PATH = "model/feature_columns.joblib"
+MODEL_PATH = "model/yield_pipeline.joblib"

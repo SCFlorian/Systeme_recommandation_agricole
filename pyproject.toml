@@ -22,7 +22,8 @@ dependencies = [
     "mlflow>=2.15.0",         # Utilise une version récente stable
     "graphql-core==3.2.3",    # FIX: Version exacte pour éviter le bug d'import
     "graphene>=3.0.0,<4.0.0",  # FIX: Version compatible avec graphql-core 3.2.3
-    "packaging==23.2"
+    "packaging==23.2",
+    "streamlit (>=1.56.0,<2.0.0)"
 ]
 
 [build-system]

@@ -4,6 +4,7 @@
 
 # Imports
 import pandas as pd
+import numpy as np
 import sys, os
 import logging
 # Chemin pour accèder aux éléments du projet
@@ -15,15 +16,9 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 # Fichier yield_df_conso
 
-def preparation_yield_df():
+def preparation_yield_df(df):
     """L'objectif ici est de partir du fichier consolidé pour préparer le fichier à la modélisation.
     On va renommer les variables et ensuite on va procéder au feature engineering"""
-    # On charge le fichier
-    try :
-        df = pd.read_csv(csv_yield_conso, index_col=0)
-    except Exception as e:
-        logging.error(f"Erreur critique lors du chargement du fichier : {e}")
-        raise e
     # On remplace les noms pour être plus cohérent
     logging.info(f"Nombre de lignes et de colonnes sans modifs : {df.shape}\n")
     df['item'] = df['item'].replace({
@@ -35,32 +30,34 @@ def preparation_yield_df():
         })
     logging.info(df['item'].unique())
     # Ajout des nouvelles variables
-    # Progrès technique
-    df['tech_trend'] = df['year'] - df['year'].min()
-    # Écart-type de la température par pays (mesure de l'instabilité)
-    df['climate_instability'] = df.groupby('area')['avg_temp'].transform('std')
-    # Le relative tech-age
-    avg_pest_country = df.groupby('area')['pesticides_tonnes'].transform('mean')
-    df['relative_tech_intensity'] = df['pesticides_tonnes'] / (avg_pest_country + 1)
-    # Suppression de l'année et de l'area
-    df = df.drop(columns={"area","year","region_avg_temp","region_avg_rain"}).copy()
+    # Flag de sécheresse (Binaire) 
+    df['is_drought'] = (df['rainfall_mm'] < 200).astype(bool)
+    # Déséquilibre intrants/eau (Ecart log)
+    df['input_imbalance'] = np.abs(np.log1p(df['pesticides_tonnes']) - np.log1p(df['rainfall_mm']))
+    # Stress thermique simple 
+    df['thermal_stress'] = np.abs(df['avg_temp'] - 20)
+    # On fixe l'année de référence 2016 pour l'interface future.
+    year_ref = 2016
+    # On crée un score de maturité technologique
+    # Plus l'écart est grand, plus les semences et machines sont supposées performantes.
+    df['years_from_now'] = year_ref - df['year']
+    df = df.drop(columns={"area","year"}).copy()
     logging.info(f"Nombre de lignes et de colonnes après nouvelles variables et suppression de 2 colonnes : {df.shape}\n")
     # On détermine quels sont nos variables catégorielles et nos variables quantitatives
     num_cols = df.select_dtypes(include='number').columns
-    cat_cols = df.select_dtypes(include='str').columns
+    cat_cols = df.select_dtypes(include=['object','bool']).columns
     logging.info(num_cols)
     logging.info(cat_cols)
     # Encodage One Hot des variables catégorielles
     df = pd.get_dummies(df, columns=cat_cols, dtype=float).copy()
     logging.info(f"Nombre de lignes et de colonnes après feature engineering {df.shape}")
     # Nettoyage du nom des variables pour uniformiser
+    df = df.drop(columns={"Unnamed: 0"}).copy()
     df.columns = df.columns.str.lower().str.replace(" ", "_")
     logging.info(df.head())
     logging.info(df.columns)
     df.to_csv("data/processed/yield_df_final_conso_encoded.csv")
     return df
-
-# Fichier crop_yield
 
 def preparation_yield_enriched():
     """L'objectif ici est de partir du fichier enrichi pour préparer le fichier à la modélisation.
@@ -73,17 +70,20 @@ def preparation_yield_enriched():
         raise e
     logging.info(df.columns)
     # Ajout des nouvelles variables
-    # Progrès technique
-    df['tech_trend'] = df['year'] - df['year'].min()
-    # Ratio climatique - indice d'irrigation critique
+    # Impact de l'irrigation
     df['irrigation_impact'] = df['Irrigation_Used'].astype(int) / (df['rainfall_mm'] + 1)
-    # Écart-type de la température par pays (mesure de l'instabilité)
-    df['climate_instability'] = df.groupby('area')['avg_temp'].transform('std')
-    # Le relative tech-age
-    avg_pest_country = df.groupby('area')['pesticides_tonnes'].transform('mean')
-    df['relative_tech_intensity'] = df['pesticides_tonnes'] / (avg_pest_country + 1)
-    # Suppression de l'année et de l'area
-    df = df.drop(columns={"year","area"}).copy()
+    # Flag de sécheresse (Binaire) 
+    df['is_drought'] = (df['rainfall_mm'] < 200).astype(bool)
+    # Déséquilibre intrants/eau (Ecart log)
+    df['input_imbalance'] = np.abs(np.log1p(df['pesticides_tonnes']) - np.log1p(df['rainfall_mm']))
+    # Stress thermique simple 
+    df['thermal_stress'] = np.abs(df['avg_temp'] - 20)
+    # On fixe l'année de référence 2016 pour l'interface future.
+    year_ref = 2016
+    # On crée un score de maturité technologique
+    # Plus l'écart est grand, plus les semences et machines sont supposées performantes.
+    df['years_from_now'] = year_ref - df['year']
+    df = df.drop(columns={"area","year"}).copy()
     logging.info(f"Nombre de lignes et de colonnes après nouvelles variables et suppression de 2 colonnes : {df.shape}\n")
     # On détermine quels sont nos varibales catégorielles et nos variables quantitatives
     num_cols = df.select_dtypes(include='number').columns
@@ -119,7 +119,7 @@ def preparation_crop_yield():
     df['growth_intensity'] = df['Temperature_Celsius'] / (df['Days_to_Harvest'] + 1)
     # On détermine quels sont nos varibales catégorielles et nos variables quantitatives
     num_cols = df.select_dtypes(include='number').columns
-    cat_cols = df.select_dtypes(include=['str','bool']).columns
+    cat_cols = df.select_dtypes(include=['object', 'string', 'bool']).columns
     # Encodage One Hot des variables catégorielles
     df = pd.get_dummies(df, columns=cat_cols, dtype=float).copy()
     logging.info(f"Nombre de lignes et de colonnes après feature engineering {df.shape}")
@@ -134,4 +134,45 @@ def preparation_crop_yield():
 
     return df
 
-df = preparation_crop_yield()
+def preparation_yield_df_inference(input_df: pd.DataFrame, expected_columns: list) -> pd.DataFrame:
+    """Prépare une ou plusieurs lignes pour la prédiction API, avec le même feature engineering
+    et le même encodage que pendant l'entraînement.
+    """
+    df = input_df.copy()
+
+    df["item"] = df["item"].replace({
+        "Rice, paddy": "Rice",
+        "Soybeans": "Soybean",
+        "Maize": "Maize",
+        "Wheat": "Wheat",
+        "Barley": "Barley"
+    })
+
+    # Flag de sécheresse
+    df['is_drought'] = (df['rainfall_mm'] < 200).astype(bool)
+    
+    # Déséquilibre intrants/eau
+    df['input_imbalance'] = np.abs(np.log1p(df['pesticides_tonnes']) - np.log1p(df['rainfall_mm']))
+    
+    # Stress thermique
+    df['thermal_stress'] = np.abs(df['avg_temp'] - 20)
+    
+    # Année de référence
+    year_ref = 2016
+    target_year = df['year'] if 'year' in df.columns else year_ref
+    df['years_from_now'] = year_ref - target_year
+
+    df = df.drop(columns=["area", "year"], errors="ignore").copy()
+
+    cat_cols = df.select_dtypes(include=["object", "string", "bool"]).columns
+    df = pd.get_dummies(df, columns=cat_cols, dtype=float).copy()
+
+    df.columns = df.columns.str.lower().str.replace(" ", "_")
+
+    for col in expected_columns:
+        if col not in df.columns:
+            df[col] = 0.0
+
+    df = df[expected_columns].copy()
+
+    return df

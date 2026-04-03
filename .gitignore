@@ -6,6 +6,7 @@ yield_df.csv
 harmonization_data/
 yield_df_final_conso.csv
 UNSD — Methodology.csv
+crop_yield_conso.csv
 
 # Notebooks
 notebook_analyse_exploratoire copy.ipynb
@@ -39,3 +40,6 @@ artifacts/
 mlflow.db
 mlflow.py
 feature_importance_random_forest.csv
+
+model/*.joblib
+*.joblib
