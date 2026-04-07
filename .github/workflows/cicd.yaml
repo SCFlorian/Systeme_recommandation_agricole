@@ -29,10 +29,14 @@ jobs:
     - name: Install dependencies
       run: poetry install --no-interaction --no-ansi --no-root
 
+    - name: Run Unit Tests
+        run: |
+          # Tests pytest depuis le dossier tests
+          pytest tests/
+
     - name: Push to Hugging Face
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
-        # Remplace par ton pseudo et le nom de ton Space
         git remote add hf https://FLORIANSC:$HF_TOKEN@huggingface.co/spaces/FLORIANSC/agritech-interface
         git push --force hf main
