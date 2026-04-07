@@ -2,8 +2,8 @@ import streamlit as st
 import requests
 
 # Configuration des URL
-API_URL_PREDICT = "http://127.0.0.1:7860/predict"
-API_URL_RECO = "http://127.0.0.1:7860/recommend"
+API_URL_PREDICT = "http://localhost:8000/predict"
+API_URL_RECO = "http://localhost:8000/recommend"
 
 st.set_page_config(page_title="Agritech Predictor", layout="wide")
 
@@ -69,7 +69,7 @@ with tab2:
 
     if submit_r:
         payload_r = {
-            "region": region_r, "year": year_r,
+            "region": region_r,
             "avg_temp": avg_temp_r, "rainfall_mm": rainfall_r, "pesticides_tonnes": pesticides_r
         }
         try:

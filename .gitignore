@@ -7,6 +7,10 @@ harmonization_data/
 yield_df_final_conso.csv
 UNSD — Methodology.csv
 crop_yield_conso.csv
+data/processed/yield_df_enriched_ready.csv
+data/processed/yield_df_final_conso_encoded_test.csv
+data/processed/yield_df_final_conso_ready.csv
+data/raw/FAOSTAT_data_en_4-6-2026.csv
 
 # Notebooks
 notebook_analyse_exploratoire copy.ipynb

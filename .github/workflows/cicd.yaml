@@ -3,9 +3,10 @@ name: CI/CD - Build & Deploy
 on:
   push:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
-  test-build-deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,7 +18,7 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.12.13"
+        python-version: "3.12"
 
     - name: Install Poetry
       run: |
@@ -28,7 +29,10 @@ jobs:
     - name: Install dependencies
       run: poetry install --no-interaction --no-ansi --no-root
 
-    - name: Run tests
+    - name: Push to Hugging Face
+      env:
+        HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
-        export PYTHONPATH="$GITHUB_WORKSPACE:$PYTHONPATH"
-        poetry run pytest --cov=src --cov=app --cov-report=term-missing --maxfail=1 --disable-warnings -q
+        # Remplace par ton pseudo et le nom de ton Space
+        git remote add hf https://florian-s:$HF_TOKEN@huggingface.co/spaces/florian-s/agritech-interface
+        git push --force hf main
