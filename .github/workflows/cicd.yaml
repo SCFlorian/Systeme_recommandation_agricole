@@ -34,5 +34,5 @@ jobs:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
       run: |
         # Remplace par ton pseudo et le nom de ton Space
-        git remote add hf https://florian-s:$HF_TOKEN@huggingface.co/spaces/florian-s/agritech-interface
+        git remote add hf https://FLORIANSC:$HF_TOKEN@huggingface.co/spaces/florian-s/agritech-interface
         git push --force hf main
