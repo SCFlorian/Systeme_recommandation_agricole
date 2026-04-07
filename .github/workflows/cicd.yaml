@@ -30,9 +30,10 @@ jobs:
       run: poetry install --no-interaction --no-ansi --no-root
 
     - name: Run Unit Tests
-        run: |
-          # Tests pytest depuis le dossier tests
-          pytest tests/
+      run: |
+        # On installe pytest et httpx spécifiquement pour les tests si pas dans pyproject
+        pip install pytest httpx 
+        pytest tests/
 
     - name: Push to Hugging Face
       env:
