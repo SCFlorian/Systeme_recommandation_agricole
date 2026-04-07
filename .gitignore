@@ -48,3 +48,5 @@ feature_importance_random_forest.csv
 
 model/*.joblib
 *.joblib
+
+.env

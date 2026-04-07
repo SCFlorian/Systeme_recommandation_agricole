@@ -7,6 +7,15 @@ from huggingface_hub import hf_hub_download
 from pydantic import BaseModel
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+import os
+from dotenv import load_dotenv
+from huggingface_hub import hf_hub_download
+
+# Charge les variables du fichier .env s'il existe (utile en local)
+load_dotenv() 
+
+# Récupère la clé (Cherche dans le .env en local, ou dans les Secrets sur HF)
+token = os.getenv("HF_TOKEN")
 
 # On importe ta fonction de nettoyage
 from scripts.data_cleaning import preparation_yield_df_inference
