@@ -18,7 +18,8 @@ with tab1:
     with st.form("form_prediction"):
         col1, col2 = st.columns(2)
         with col1:
-            item = st.selectbox("Culture", ["Wheat", "Rice", "Maize", "Barley", "Soybean"], key="item_p")
+            item = st.selectbox("Culture", ['Maize', 'Potatoes', 'Rice', 'Wheat', 'Sorghum', 'Soybean',
+                                            'Cassava', 'Yams', 'Sweet potatoes', 'Plantains and others'], key="item_p")
             region = st.selectbox("Région", ['Southern Asia', 'Southern Europe', 'Northern Africa', 'Polynesia',
                                                  'Sub-Saharan Africa', 'Latin America and the Caribbean',
                                                  'Western Asia', 'Australia and New Zealand', 'Western Europe',
@@ -26,9 +27,9 @@ with tab1:
                                                  'Northern Europe', 'Melanesia', 'Micronesia','Central Asia'], key="reg_p")
         
         with col2:
-            avg_temp = st.slider("Température Moyenne (°C)", -5.0, 45.0, 15.0, key="temp_p")
-            rainfall = st.slider("Précipitations (mm)", min_value=0, value=500, key="rain_p")
-            pesticides = st.slider("Pesticides (tonnes)", min_value=0.0, value=100.0, key="pest_p")
+            avg_temp_r = st.slider("Température Moyenne (°C)", -5.0, 45.0, 15.0, key="temp_r")
+            rainfall_r = st.slider("Précipitations (mm)", min_value=0, value=3500, key="rain_r")
+            pesticides_r = st.slider("Pesticides (tonnes)", min_value=0.0, value=1850000.0, key="pest_r")
         
         submit_p = st.form_submit_button("Lancer la prédiction")
 
@@ -42,7 +43,7 @@ with tab1:
                 res = requests.post(API_URL_PREDICT, json=payload)
                 res.raise_for_status()
                 data = res.json()
-                st.success(f"### Résultat : {data['prediction']:.2f} hg/ha")
+                st.success(f"### Résultat : {data['prediction']:.2f} kg/ha")
         except Exception as e:
             st.error(f"Erreur : {e}")
 

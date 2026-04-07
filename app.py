@@ -96,7 +96,7 @@ def predict_api(data: InputPrediction):
         prediction = pipeline.predict(donnees_preparees)[0]
 
         return {
-            "prediction": float(prediction),
+            "prediction": float(prediction/10),
             "unit": "yield"
         }
 
@@ -139,7 +139,7 @@ def recommend_api(data: InputRecommendation):
 
             results.append({
                 "crop": crop,
-                "predicted_yield": float(prediction)
+                "predicted_yield": float(prediction/10)
             })
 
         results = sorted(results, key=lambda x: x["predicted_yield"], reverse=True)
