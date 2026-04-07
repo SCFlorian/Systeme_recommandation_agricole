@@ -12,7 +12,7 @@ ENV PATH="/root/.local/bin:$PATH"
 # Copie des fichiers de dépendances
 COPY pyproject.toml poetry.lock* ./
 
-# Installation des librairies sans créer d'environnement virtuel (plus simple en Docker)
+# Installation des librairies
 RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi --no-root
 
 # Copie du reste du code (les datasets et modèles sont ignorés via .gitignore)

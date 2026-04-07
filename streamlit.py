@@ -58,12 +58,11 @@ with tab2:
                                                  'Western Asia', 'Australia and New Zealand', 'Western Europe',
                                                  'Eastern Europe', 'Northern America', 'South-eastern Asia','Eastern Asia',
                                                  'Northern Europe', 'Melanesia', 'Micronesia','Central Asia'], key="reg_r")
-            year_r = st.number_input("Année", 2024, 2050, 2024, key="year_r")
         
         with col2:
             avg_temp_r = st.slider("Température Moyenne (°C)", -5.0, 45.0, 15.0, key="temp_r")
-            rainfall_r = st.slider("Précipitations (mm)", min_value=0, value=500, key="rain_r")
-            pesticides_r = st.slider("Pesticides (tonnes)", min_value=0.0, value=100.0, key="pest_r")
+            rainfall_r = st.slider("Précipitations (mm)", min_value=0, value=3500, key="rain_r")
+            pesticides_r = st.slider("Pesticides (tonnes)", min_value=0.0, value=1850000.0, key="pest_r")
         
         submit_r = st.form_submit_button("Trouver la meilleure culture")
 

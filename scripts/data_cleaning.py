@@ -1,6 +1,6 @@
-# ========================================================
-# Nettoyage des fichiers à partir des fichiers consolidés
-# ========================================================
+# ==========================================================================
+# Nettoyage des fichiers à partir des fichiers consolidés (après imputation)
+# ==========================================================================
 
 import pandas as pd
 import numpy as np
@@ -12,9 +12,9 @@ from scripts.config import (csv_yield_conso, csv_yield_enriched, csv_file_crop_y
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-
+# Les 2 fonctions suivantes corrrespondent à la préparation du fichier avant encodage et séparation du split X,y
 def preparation_yield_df(df):
-    """Prépare le fichier consolidé pour la modélisation."""
+    """Prépare le fichier consolidé non enrichi pour la modélisation."""
     logging.info(f"Nombre de lignes et de colonnes sans modifs : {df.shape}\n")
 
     df = df.copy()
@@ -29,7 +29,7 @@ def preparation_yield_df(df):
 
     logging.info(df['item'].unique())
 
-    # Optionnel si tu veux conserver ce filtre
+    # On enlève les valeurs à 0
     df = df.loc[df['yield'] > 0].copy()
 
     df['is_drought'] = (df['rainfall_mm'] < 200).astype(bool)
@@ -54,12 +54,10 @@ def preparation_yield_df(df):
     logging.info(df.head())
     logging.info(df.columns)
 
-    # Le nom de fichier devrait refléter qu'il n'est plus encodé
-    df.to_csv("data/processed/yield_df_final_conso_ready.csv", index=False)
+    # Sauveragrde du fichier
+    df.to_csv("data/processed/yield_df_final_conso.csv", index=False)
 
     return df
-
-
 
 def preparation_yield_enriched(df):
     """Prépare le fichier enrichi pour la modélisation."""
@@ -77,7 +75,7 @@ def preparation_yield_enriched(df):
 
     logging.info(df['item'].unique())
 
-    # Optionnel si tu veux conserver ce filtre
+    # On enlève les valeurs à 0
     df = df.loc[df['yield'] > 0].copy()
 
     df['is_drought'] = (df['rainfall_mm'] < 200).astype(bool)
@@ -102,45 +100,12 @@ def preparation_yield_enriched(df):
     logging.info(df.head())
     logging.info(df.columns)
 
-    # Le nom de fichier devrait refléter qu'il n'est plus encodé
-    df.to_csv("data/processed/yield_df_enriched_ready.csv", index=False)
+    # Sauvegarde du fichier
+    df.to_csv("data/processed/yield_df_enriched_conso.csv", index=False)
 
     return df
 
-df = pd.read_csv("data/processed/yield_df_enriched.csv")
-df = preparation_yield_enriched(df)
-
-def preparation_crop_yield():
-    """Préparation du fichier crop_yield pour modélisation."""
-    try:
-        df = pd.read_csv(csv_file_crop_yield_clean, index_col=0)
-    except Exception as e:
-        logging.error(f"Erreur critique lors du chargement du fichier : {e}")
-        raise e
-
-    logging.info(f"Nombre de lignes et de colonnes sans modifs : {df.shape}\n")
-
-    df['irrigation_impact'] = df['Irrigation_Used'].astype(int) / (df['Rainfall_mm'] + 1)
-    df['growth_intensity'] = df['Temperature_Celsius'] / (df['Days_to_Harvest'] + 1)
-
-    df = df.drop(columns=["Unnamed: 0"], errors="ignore").copy()
-
-    num_cols = df.select_dtypes(include=['number']).columns
-    cat_cols = df.select_dtypes(include=['object', 'string', 'bool']).columns
-
-    df = df.rename(columns={"Yield_tons_per_hectare": "yield"}).copy()
-    df.columns = df.columns.str.lower().str.replace(" ", "_")
-
-    logging.info(num_cols)
-    logging.info(cat_cols)
-    logging.info(df.columns)
-    logging.info(df.shape)
-
-    df.to_csv("data/processed/crop_yield_ready.csv", index=False)
-
-    return df
-
-
+# Fonction dédiée au modèle lors que l'API va refaire l'ensemble des traitement 
 def preparation_yield_df_inference(input_df: pd.DataFrame) -> pd.DataFrame:
     """Prépare une ou plusieurs lignes pour la prédiction API
     avec le même feature engineering qu'à l'entraînement.
