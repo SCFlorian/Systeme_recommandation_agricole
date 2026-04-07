@@ -50,3 +50,6 @@ model/*.joblib
 *.joblib
 
 .envnotebooks/graph/
+.env
+analyse_extremes_agricoles.png
+graph/
