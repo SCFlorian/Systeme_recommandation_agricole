@@ -114,7 +114,7 @@ Notre distribution ressemble à une cloche, donc à une distribution normale mê
 
 - Boxplot pour analyser le type de culture par rapport au rendement.
 
-![alt text](notebooks/graph/boxplot_crop_yield.png)
+<img width="640" height="480" alt="Image" src="https://github.com/user-attachments/assets/b9390456-6099-4587-88f3-6fd2dcbf7d60" />
 
 - On retrouve quelques valeurs aberrantes sur notre variable cible. On peut voir des rendements négatifs donc nous avons décidé de les supprimer car cela concerne uniquement 231 lignes sur les 1 million.
 - Les valeurs "extrêmes" supérieurs sont moins présents et ne présentent pas d'anomalies statistiques.
@@ -143,7 +143,7 @@ Nos variables sont indépendantes, ce qui nous ne permet pas de réaliser une bo
 
 - Cercle de corrélation :
 
-![alt text](notebooks/graph/cercle_correlation.png)
+<img width="800" height="800" alt="Image" src="https://github.com/user-attachments/assets/c5fc4b07-70b3-44d4-8106-71a2384e9c99" />
 
 - Les variables alignées, elles pointent dans la même direction :
     - Fertilizer_Used
@@ -184,14 +184,14 @@ Après analyse du fichier :
 - Pas de valeurs manquantes
 - Présence de valeurs extrêmes
 
-La présence de valeur extrême est expliqué par un gros écart entre les gros utilisateurs de pesticide et les petits utilisateurs.
+La présence de valeur extrême est expliquée par un gros écart entre les gros utilisateurs de pesticide et les petits utilisateurs.
 **Le top 5 des plus gros utilisateurs de pesticide représente 66% de la valeur globale.**
 
 On a analysé les pays en "écart", rien ne semble anormal, ce sont des pays qui peuvent être des gros utilisateurs.
 
 **Évolution de l'utilisation des pesticides dans le temps**
 
-![alt text](notebooks/graph/histo_pesticide.png)
+<img width="1000" height="600" alt="Image" src="https://github.com/user-attachments/assets/e0fcb6ba-2ec4-4d83-8c8f-7b63686f2621" />
 
 - Depuis les années 2000 jusqu'en 2006, on remarque une croissance de l'utilisation des pesticides de manière globale.
 - Une petite en chute en 2009 avec une légère progression ensuite mais depuis 2011, l'utilisation reste constante.
@@ -246,17 +246,17 @@ Ce fichier est central et sera donc le fichier à consolidé avec les fichiers d
 
 **Distribution de la variable de rendement :**
 
-![alt text](notebooks/graph/distribution_variable_cible_fichier_yield.png)
+<img width="800" height="400" alt="Image" src="https://github.com/user-attachments/assets/2c793cd5-abe9-4cad-8d37-4197ea4ac319" />
 
-On voit un étalement vers la gauche. Les données se suivent pas une distribution quasi normale comme le premier dataset. Le fichier est plus déséquilibré.
+On voit un étalement vers la gauche. Les données se suivent pas une distribution quasi normale comme le premier dataset. Le fichier est + déséquilibré.
 
 **Boxplot par type de culture et rendement :**
 
-![alt text](notebooks/graph/boxplot_yield.png)
+<img width="1400" height="700" alt="Image" src="https://github.com/user-attachments/assets/e651fc71-b238-4fac-959c-d243b3d31f22" />
 
-- On peut voir quelques valeurs à 0. Difficile de savoir si on les supprime ou non car théoriquement un rendement à 0 c'est possible si les conditions ne sont pas réunies pour une production.
+- On peut voir quelques valeurs à 0. Difficile de savoir si on les supprime ou non car théoriquement un rendement à 0 c'est possible si les conditions ne sont pas réunies pour une production. Mais certaines valeurs ressemblantes ont des données de rendement. Nous avons seulement 8 valeurs à 0 alors on peut les supprimer.
 - On voit une valeur énorme pour Plaintains and more
-    - La valeur extrême date de 1964, nous irons pas dans des dates aussi antérieures donc on l'enlevera par défaut par la suite.
+    - La valeur extrême date de 1964, nous irons pas dans des dates aussi antérieures donc elle sera enlevée par défaut par la suite.
 - On voit un fort déséquilibre entre les types de culture. On peut noter que la catégorie Potatoes semble avoir avoir des rendements plus élevés que les autres. Ce sont des valeurs extrêmes mais pas aberrantes car elles sont réelles alors nous devons les laisser. 
 
 ### Fichier yield_df.csv
@@ -272,7 +272,7 @@ Pour une meilleure analyse, nous allons consolider un nouveau fichier yield_df c
 
 ### Nouveau fichier consolidé :
 
-Avant de pouvoir étudier correctement les relations entre les différentes conditions météoroliques, nous devons consolider les fichiers suivants :
+Avant de pouvoir étudier correctement les relations entre les différentes conditions météorologiques, nous devons consolider les fichiers suivants :
 - yield.csv
 - pesticides.csv
 - rainfall.csv
@@ -284,7 +284,7 @@ Il y a plusieurs problématiques :
 - Un nombre d'années différent entre les fichiers
 - Impact potentiel, un nombre de NaN conséquent pour certains pays et certaines années.
 
-Choix méthodoliques :
+Choix méthodologiques :
 
 - Harmonisation des noms de pays pour assurer la compatibilité entre les différentes sources
 - Restriction à la période commune (1990–2016) afin d’éviter des valeurs manquantes excessives, notamment sur les données de température et avoir des années récentes
@@ -324,7 +324,7 @@ Exemples de modifications :
 
 4. Fusion des datasets à partir de yield
 - Merge des fichiers un à un
-- Passage à 7 colonnes et 29 151 lignes avec des valeurs manquantes pour les conditions climatiques. Valeurs manquantes
+- Passage à 7 colonnes et 29 151 lignes avec des valeurs manquantes pour les conditions climatiques. Valeurs manquantes :
     - avg_temp -> 0.363521
     - pesticides_tonnes -> 0.171452
     - rainfall_mm -> 0.102261
@@ -362,24 +362,26 @@ Eastern Asia                     China                              216
 
 **Tableau final**
 ```
-area	    year	item	avg_temp  rainfall_mm	pesticides_tonnes	yield
-Afghanistan	1990	Maize	15.450	  327.0	        1594.50	            7582
-Afghanistan	1991	Maize	14.570	  327.0	        1594.50	            16800
-Afghanistan	1992	Maize	14.350	  327.0	        1594.50	            15000
-Afghanistan	1993	Maize	14.960	  327.0	        1594.50	            16786
-Afghanistan	1994	Maize	14.940	  327.0	        1594.50	            16667
+area	     region	        year	item   avg_temp  rainfall_mm  pesticides_tonnes	 yield
+Afghanistan	 Southern Asia	1990	Maize  15.45	 327.0	      1594.5	         17582
+Afghanistan	 Southern Asia	1991	Maize  14.57	 327.0	      1594.5	         16800
+Afghanistan	 Southern Asia	1992	Maize  14.35	 327.0	      1594.5	         15000
+Afghanistan	 Southern Asia	1993	Maize  14.96	 327.0	      1594.5	         16786
+Afghanistan	 Southern Asia	1994	Maize  14.94	 327.0	      1594.5	         16667
+
 ```
 
 Cet exemple est pertinent :
 
 - On voit des données de température différente par année pour un même pays : les données étaient ainsi dans le fichier temp
+- La région est bien rajoutée
 - Pour rainfall les données de base sont répetées par année
 - Pour ce pays en particulier il n'y avait pas d'informations pour les pesticides, ces données ont été imputé
-- On observe bien un rendmeent différent par année pour un même pays
+- On observe bien un rendement différent par année pour un même pays
 
 **Matrice corrélation**
 
-![alt text](notebooks/graph/matrice_correlation_spearman.png)
+<img width="800" height="600" alt="Image" src="https://github.com/user-attachments/assets/e2b81dff-484e-46b6-94be-60a312ba165f" />
 
 - On note une corrélation assez forte entre les températures moyennes et les précipitations
 - Avec la valeur cible c'est la valeur des pesticides qui a un lien + fort que les autres
@@ -552,24 +554,26 @@ Nous devons maintenant continuer l'amélioration de nos données en ajoutant des
 
 **Nouvelles variables**
 
-- regroupement des pays : regroupement par grande catégorie pour garder une certaine cohérence
-- tech_trend : capte la croissance historique des rendements liée aux innovations technologiques au fil des ans.
-- irrigation_impact : mesure l'importance vitale de l'apport d'eau artificiel, particulièrement élevée lorsque les précipitations naturelles sont insuffisantes.
-- pest_rain_ratio : évalue l'efficacité potentielle des traitements chimiques en tenant compte du risque de lessivage par les fortes pluies.
-- climate_instability : identifie les régions à risque en mesurant la variabilité.
-- relative_tech_intensity : indique si l'effort technologique d'une année spécifique est supérieur ou inférieur à la norme historique du pays concerné.
+```
+Ratio climatique - indice d'irrigation critique :
+yield_df_enriched['irrigation_impact'] = yield_df_enriched['Irrigation_Used'].astype(int) / (yield_df_enriched['rainfall_mm'] + 1)
 
-**Matrice de corrélation**
+Flag de sécheresse (Binaire) :
+yield_df_enriched['is_drought'] = (yield_df_enriched['rainfall_mm'] < 200).astype(float)
 
-![alt text](notebooks/graph/matrice_correlation_spearman_conso.png)
+Déséquilibre intrants/eau (Ecart log) :
+yield_df_enriched['input_imbalance'] = np.abs(np.log1p(yield_df_enriched['pesticides_tonnes']) - np.log1p(yield_df_enriched['rainfall_mm']))
 
-Pas relation forte entre nos variables mais on voit que l'ajout des nouvelles variables ne sont pas redondantes avec les features d'origine.
+Stress thermique simple :
+yield_df_enriched['thermal_stress'] = np.abs(yield_df_enriched['avg_temp'] - 20)
 
-### Encodage des variables catégorielles
+On fixe l'année de référence 2016 pour l'interface future :
+year_ref = 2016
 
-Un modèle de machine learning ne peut pas comprendre les valeurs non numériques alors nous devons transformer nos variables catégorielles, quitte à avoir des colonnes supplémentaires.
-
-- **Passage des colonnes catégorielles avec One Hot.**
+On crée un score de maturité technologique. Plus l'écart est grand, plus les semences et machines sont supposées performantes :
+yield_df_enriched['years_from_now'] = year_ref - yield_df_enriched['year']
+```
+- Pas relation forte entre nos variables mais on voit que l'ajout des nouvelles variables ne sont pas redondantes avec les features d'origine.
 
 ## Feature engineering sur le fichier consolidé
 
@@ -577,45 +581,29 @@ Afin de s'assurer de la pertinence de l'enrichissement de nos données, on va de
 
 Pour réaliser cela, nous devons effectuer le même feature engineering.
 
-Nous avons désormais consolidé notre dataset :
-- Une première fois avec 3 variables climatiques puis imputer de manière rigoureuse pour les données manquantes.
-- Une deuxième fois en enrichissant le dataset avec des variables approximatives qui devraient aider notre modèle à mieux généraliser
-
-Nous devons maintenant continuer l'amélioration de nos données en ajoutant des données si possibles,et en transformant nos données pour être compréhensible pour un modèle.
+Nous devons maintenant continuer l'amélioration de nos données en ajoutant des données si possibles.
 
 **Nouvelles variables**
 
-- regroupement des pays : regroupement par grande catégorie pour garder une certaine cohérence
-- tech_trend : capte la croissance historique des rendements liée aux innovations technologiques au fil des ans.
-- pest_rain_ratio : évalue l'efficacité potentielle des traitements chimiques en tenant compte du risque de lessivage par les fortes pluies.
-- climate_instability : identifie les régions à risque en mesurant la variabilité.
-- relative_tech_intensity : indique si l'effort technologique d'une année spécifique est supérieur ou inférieur à la norme historique du pays concerné.
+```
+Flag de sécheresse (Binaire) :
+yield_df_final_conso['is_drought'] = (yield_df_final_conso['rainfall_mm'] < 200).astype(float)
+
+Déséquilibre intrants/eau (Ecart log) :
+yield_df_final_conso['input_imbalance'] = np.abs(np.log1p(yield_df_final_conso['pesticides_tonnes']) - np.log1p(yield_df_final_conso['rainfall_mm']))
+
+Stress thermique simple :
+yield_df_final_conso['thermal_stress'] = np.abs(yield_df_final_conso['avg_temp'] - 20)
+
+On fixe l'année de référence 2016 pour l'interface future :
+year_ref = 2016
+
+On crée un score de maturité technologique. Plus l'écart est grand, plus les semences et machines sont supposées performantes :
+yield_df_final_conso['years_from_now'] = year_ref - yield_df_final_conso['year']
+```
 
 Sans avoir enrichi notre fichier, on ne peut pas ajouter la variable irrigation_impact qui dépend de Irrigation_Used.
 
-### Encodage des variables catégorielles
-
-Un modèle de machine learning ne peut pas comprendre les valeurs non numériques alors nous devons transformer nos variables catégorielles, quitte à avoir des colonnes supplémentaires.
-
-- **Passage des colonnes catégorielles avec One Hot.**
-
-## Comparaison du fichier avec et sans enrichissement sur plusieurs modèles
-
-Afin de voir si les variables rajoutées du fichier synthétique vers le fichier principal ont du sens, on va comparer sur ces 2 fichiers plusieurs modèles de machine learning.
-
-```
-dataset	           model	        n_rows	n_features	cv_rmse_mean  cv_rmse_std	cv_mae_mean	cv_mae_std	cv_r2_mean	cv_r2_std	test_rmse	test_mae	test_r2
-Fichier enrichi	   DummyRegressor   29151	38	        75652.6639	  1271.5658	    55591.4405	612.0935	-0.0007	    0.0003	    73864.1004	54567.1261	-0.0012
-Fichier consolidé  DummyRegressor   29151	24	        75652.6639	  1271.5658	    55591.4405	612.0935	-0.0007	    0.0003	    73864.1004	54567.1261	-0.0012
-Fichier enrichi	   LightGBM	        29151	38	        28195.1980	  830.2414	    17920.1400	314.8971	0.8609	    0.0064	    27703.8593	17454.4365	0.8592
-Fichier consolidé  LightGBM	        29151	24	        27954.8256	  876.4924	    17768.2938	310.4446	0.8633	    0.0071	    27956.1463	17625.7264	0.8566
-Fichier enrichi	   LinearRegression	29151	38	        51310.2734	  1258.0180	    33432.7746	650.7589	0.5397	    0.0096	    50982.7735	33071.1113	0.5230
-Fichier consolidé  LinearRegression	29151	24	        51341.9533	  1271.3610	    33444.5241	675.6013	0.5392	    0.0096	    51047.0116	33133.5267	0.5218
-Fichier enrichi	   RandomForest	    29151	38	        20799.5607	  772.1689	    10226.1873	294.6239	0.9243	    0.0051	    19681.5670	9289.9715	0.9289
-Fichier consolidé  RandomForest	    29151	24	        20383.3497	  855.5534	    9515.7169	295.8420	0.9272	    0.0056	    19686.6864	8720.9609	0.9289
-Fichier consolidé  XGBoost	        29151	24	        22671.0428	  684.7109	    13549.7758	299.5553	0.9101	    0.0046	    22180.2492	12803.4932	0.9097
-Fichier enrichi	   XGBoost	        29151	38	        23464.4425	  536.1863	    14145.8625	277.0853	0.9037	    0.0033	    22706.2423	13230.0410	0.9054
-```
 
 - Sur ces premiers tests on ne voit pas des meilleurs résultats pour le fichier enrichi, les informations rajoutées ne semblent pas apporter quelque chose d'utile pour nos modèles.
 - On voit que le modèle de RandomForest a des meilleurs résulats (sans optimisation des meilleurs paramètres) mais suivi de très près par XGBoost et LightGBM.
