@@ -604,7 +604,71 @@ yield_df_final_conso['years_from_now'] = year_ref - yield_df_final_conso['year']
 
 Sans avoir enrichi notre fichier, on ne peut pas ajouter la variable irrigation_impact qui dépend de Irrigation_Used.
 
+**Matrice des corrélations**
+
+<img width="2277" height="1772" alt="Image" src="https://github.com/user-attachments/assets/dff6af55-5ed6-4d2f-9c80-a65fd5ed0faf" />
+
+Nous n'avons pas ici des variables trop corrélées ensemble, nous n'avons pas à enlever d'autres variables.
 
 - Sur ces premiers tests on ne voit pas des meilleurs résultats pour le fichier enrichi, les informations rajoutées ne semblent pas apporter quelque chose d'utile pour nos modèles.
 - On voit que le modèle de RandomForest a des meilleurs résulats (sans optimisation des meilleurs paramètres) mais suivi de très près par XGBoost et LightGBM.
 - N'ayant pas une distribution linéaire, on voit que la regression linéraire ne généralise pas.
+
+## Modélisation
+
+Dans la phase d'analyse exploratoire et de prétraitement, nous avons fait le choix de tester dans un premier temps les 2 fichiers consolidés que nous avons réalisé :
+- dataset consolidé sans enrichissement
+- dataset consolidé avec enrichissement (à l'aide du fichier crop_yield)
+
+Suivi de la modélisation avec des pratiques de MLOps, nous utilisons **MLFlow** pour suivre les expérimentations. L'ensemble des tests ont été réalisé dans le notebook dédié à la modélisation. À l'intérieur on va retouver plusieurs blocs :
+- un suivi MLFlow de 5 modèles sur le fichier consolidé
+- un suivi MLFlow de 5 modèles sur le fichier consolidé avec enrichissement
+- un suivi MLFlow pour l'optimisation des hyperparamètres du modèle retenu
+
+### Choix des modèles
+
+On a testé 5 modèles différents :
+- DummyRegressor
+- LinearRegression
+- RandomForestRegressor
+- XGBRegressor
+- LGBMRegressor
+
+**Pourquoi ces modèles ?**
+
+- D’abord, une baseline minimale avec DummyRegressor. Le but était d’avoir un point de comparaison naïf. Ça permet de vérifier que le pipeline apprend réellement quelque chose et qu’on ne se satisfait pas d’un score “bon en apparence”.
+- Ensuite, une baseline linéaire avec LinearRegression. Utilisation pour tester l’hypothèse la plus simple : si le rendement s’explique surtout par des relations linéaires entre climat, intrants et culture.
+- Ensuite on a testé 3 trois familles d'arbres car le problème mélange :
+    - des variables numériques comme avg_temp, rainfall_mm, pesticides_tonnes, thermal_stress etc
+    - des variables catégorielles comme region, item, is_drought
+    - et potentiellement des relations non linéaires et des interactions fortes entre climat, zone géographique et type de culture.
+
+**Choix du pipeline**
+
+- Pipeline scikit-learn : le préprocessing et le modèle sont encapsulés ensemble, donc on évite les écarts entre train et test.
+- Cross-validation : les scores ne reposent pas sur un seul split.
+- random_state=42 sur les modèles et le KFold : les résultats sont reproductibles.
+- MLflow : chaque run conserve paramètres, métriques et version du modèle.
+- Le meilleur pipeline est sauvegardé avec joblib, ce qui facilite la réutilisation et l’audit.
+- Les analyses SHAP et feature importance renforcent l’explicabilité en plus de la feature importance.
+- Schéma du pipeline :
+
+<img width="399" height="177" alt="Image" src="https://github.com/user-attachments/assets/0a7cc810-5cae-4773-aa07-e965ed55b0e0" />
+
+**Robustesse du pipeline**
+- GridSearchCV(..., error_score="raise") : si un entraînement échoue, l’erreur remonte immédiatement.
+- si MLflow n’est pas disponible, le tracking peut échouer.
+- si un fichier CSV ou un artefact .joblib manque, le notebook s’arrête.
+- les cellules SHAP dépendent du pipeline sauvegardé, donc si le modèle n’est pas exporté avant, cette partie casse.
+
+**Métriques des performance des modèles**
+- Coefficient de détermination (R2) : mesure la part de variance expliquée par le modèle.
+- Erreur quadratique moyenne (RMSE) : mesure l'erreur moyenne en donnant plus de poids aux grosses erreurs.
+- Erreur absolue moyenne (MAE) : moyenne des erreurs en valeur absolue
+- Erreur relative (MAPE) : erreur en pourcentage
+- Erreur économique (economic_error_usd_ha) : c'ets une métrique métier personnalisée, elle convertit l'erreur de prédiction en perte financière par hectare
+
+### Résultats des performances sur le fichier consolidé
+
+<img width="45%" height="600" alt="Image" src="https://github.com/user-attachments/assets/f0f6cc35-c0c5-4e31-a8e9-178fb543aff4" /> <img width="45%" height="600" alt="Image" src="https://github.com/user-attachments/assets/2bf8ee15-1d92-4ea4-b43b-0fbf440f6f21" />
+
