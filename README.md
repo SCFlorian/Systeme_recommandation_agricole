@@ -18,7 +18,7 @@ pinned: false
 5. [Feature engineering sur le fichier enrichi](#feature-engineering-sur-le-fichier-enrichi)
 6. [Feature engineering sur le fichier consolidé](#feature-engineering-sur-le-fichier-consolidé)
 7. [Modélisation](#modélisation)
-8. [Interprétabilité du modèle : feature importance et SHAP values](#interprétabilité-du-modèle-:-feature-importance-et-shap-values)
+8. [Interprétabilité du modèle feature importance et SHAP values](#interprétabilité-du-modèle-feature-importance-et-shap-values)
 
 ## Présentation
 
@@ -800,7 +800,7 @@ Les meilleurs hyperparamètres retenus sont les suivants (en comparaison avec la
 Les gains observés après optimisation restent toutefois limités.  
 Ce comportement suggère que le modèle se situe déjà proche de son optimum sur les données disponibles. En conséquence, les marges de progression futures semblent davantage liées à l’enrichissement des données qu’à une optimisation algorithmique supplémentaire.
 
-## Interprétabilité du modèle : feature importance et SHAP values
+## Interprétabilité du modèle feature importance et SHAP values
 
 Afin de mieux comprendre les mécanismes de prédiction du modèle retenu, deux approches complémentaires d’interprétabilité ont été utilisées :
 - la feature importance native du Random Forest
