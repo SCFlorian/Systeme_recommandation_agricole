@@ -8,7 +8,7 @@ app_port: 7860
 pinned: false
 ---
 
-# Système de recommandation agricole
+# Système de recommandation agricole 
 ## Sommaire
 
 1. [Présentation](#présentation)
@@ -105,7 +105,7 @@ Nombre de valeur unique : Weather_Condition: 3
 
 La distibution de notre variable cible :
 
-![alt text](notebooks/graph/distribution_variable_cible.png)
+<img width="800" height="400" alt="Image" src="https://github.com/user-attachments/assets/cdc01b6a-ac60-4681-9b00-60ebe629978d" />
 
 Notre distribution ressemble à une cloche, donc à une distribution normale même si on ne peut pas la considérer comme telle car on voit quelques petits dépassements.
 

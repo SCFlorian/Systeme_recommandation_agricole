@@ -28,7 +28,6 @@ app = FastAPI(title="Agritech Answers")
 # CHARGEMENT DYNAMIQUE DU MODÈLE
 # ==========================================
 def load_remote_pipeline():
-    # Remplace par ton repo de modèle créé précédemment
     REPO_ID = "FLORIANSC/yield-prediction-model" 
     FILENAME = "randomforest_best_pipeline.joblib"
     

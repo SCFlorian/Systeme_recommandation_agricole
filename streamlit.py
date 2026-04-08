@@ -27,9 +27,9 @@ with tab1:
                                                  'Northern Europe', 'Melanesia', 'Micronesia','Central Asia'], key="reg_p")
         
         with col2:
-            avg_temp_r = st.slider("Température Moyenne (°C)", -5.0, 45.0, 15.0, key="temp_r")
-            rainfall_r = st.slider("Précipitations (mm)", min_value=0, value=3500, key="rain_r")
-            pesticides_r = st.slider("Pesticides (tonnes)", min_value=0.0, value=1850000.0, key="pest_r")
+            avg_temp = st.slider("Température Moyenne (°C)", -5.0, 45.0, 15.0, key="temp_r")
+            rainfall = st.slider("Précipitations (mm)", min_value=0, value=3500, key="rain_r")
+            pesticides = st.slider("Pesticides (tonnes)", min_value=0.0, value=1850000.0, key="pest_r")
         
         submit_p = st.form_submit_button("Lancer la prédiction")
 
