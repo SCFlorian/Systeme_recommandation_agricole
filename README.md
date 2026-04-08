@@ -17,6 +17,7 @@ pinned: false
 4. [Enrichissement du fichier consolidé](#enrichissement-du-fichier-consolidé)
 5. [Feature engineering sur le fichier enrichi](#feature-engineering-sur-le-fichier-enrichi)
 6. [Feature engineering sur le fichier consolidé](#feature-engineering-sur-le-fichier-consolidé)
+7. [Modélisation](#modélisation)
 
 ## Présentation
 
@@ -670,5 +671,130 @@ On a testé 5 modèles différents :
 
 ### Résultats des performances sur le fichier consolidé
 
-<img width="45%" height="600" alt="Image" src="https://github.com/user-attachments/assets/f0f6cc35-c0c5-4e31-a8e9-178fb543aff4" /> <img width="45%" height="600" alt="Image" src="https://github.com/user-attachments/assets/2bf8ee15-1d92-4ea4-b43b-0fbf440f6f21" />
+Les expérimentations montrent que les modèles d’arbres surpassent nettement les baselines simples.  
+Le **RandomForestRegressor** obtient les meilleures performances globales sur le dataset consolidé, avec un **R² test de 0,9425**, un **RMSE de 1729,7 kg/ha** et un **MAE de 796,5 kg/ha**.  
+
+L’enrichissement du dataset à partir du fichier `crop_yield` n’a pas permis d’améliorer les performances de manière significative. Le choix final s’est donc porté sur le **dataset consolidé sans enrichissement**, plus simple, plus lisible et tout aussi performant.
+
+**Dans le détail** 
+
+**Sur les 2 modèles "simples"**
+- Sur le DummyRegressor et le LinearRegression les résultats ne sont pas bons, c'était attendu. Le Dummy nous sert comme base pour comparer et nous ne sommes pas face à une distribution linéaire alors LinearRegression ne généralise pas bien. Les modèles linéaires montrent leurs limites sur ce problème, ce qui confirme la présence de relations non linéaires entre les variables explicatives et le rendement.
+
+- DummyRegressor :
+```
+=== Résultats métriques ===
+CV RMSE : 7604.3730 (± 187.80)
+CV MAE  : 5578.7140 (± 93.2737)
+CV R2   : -0.0002 (± 0.0002)
+Test RMSE : 7216.6343
+Test R2   : -0.0013
+Test MAE  : 5378.3028
+Test economic_error_usd_ha : 1680.7060
+```
+- LinearRegression :
+```
+=== Résultats métriques ===
+CV RMSE : 4840.4290 (± 55.16)
+CV MAE  : 3233.5153 (± 58.2632)
+CV R2   : 0.5943 (± 0.0143)
+Test RMSE : 4805.9227
+Test R2   : 0.5559
+Test MAE  : 3201.1100
+Test economic_error_usd_ha : 1033.3629
+```
+**Comparaison sur tous les modèles**
+- Résultats des tests du R2
+
+<img width="1200" height="600" alt="Image" src="https://github.com/user-attachments/assets/f0f6cc35-c0c5-4e31-a8e9-178fb543aff4" />
+
+- Résultats des tests du MAPE 
+
+<img width="1200" height="600" alt="Image" src="https://github.com/user-attachments/assets/2bf8ee15-1d92-4ea4-b43b-0fbf440f6f21" />
+
+Les modèles d’arbres obtiennent des performances nettement supérieures aux modèles de référence.
+
+Par exemple le RandomForest a "seulement" 17% d'erreur en valeur absolue, en comparaison d'un erreur sur 2 pour le LGBMRegressor.
+
+
+**Petit focus sur ces 2 modèles**
+**RandomForestRegressor**
+```
+=== Résultats métriques ===
+CV RMSE : 1893.0226 (± 45.34)
+CV MAE  : 894.9234 (± 4.1971)
+CV R2   : 0.9378 (± 0.0051)
+Test RMSE : 1729.6763
+Test R2   : 0.9425
+Test MAE  : 796.4869
+Test economic_error_usd_ha : 273.6834
+```
+- Sur la validation croisée on voit que l'écart-type entrent les différents folds est petit, les résultats restent stables.
+- Le MAE peut est à 796 par kg/ha sur le test. Cela peut sembler haut mais il faut prendre en compte le contexte métier ici où on sait que les rendements dépendent de beaucoup de facteurs et que les prédictions sont à ajuster avec sa connsaissance terrain.
+
+
+**XGBRegressor**
+```
+=== Résultats métriques ===
+CV RMSE : 2152.0037 (± 71.11)
+CV MAE  : 1292.0533 (± 24.5055)
+CV R2   : 0.9195 (± 0.0082)
+Test RMSE : 2040.8158
+Test R2   : 0.9199
+Test MAE  : 1226.2530
+Test economic_error_usd_ha : 406.6547
+```
+- Même si les résultats ne sont pas mauvais ils restent bien en-dessous sur toutes les métriques.
+
+**Analyse du MAE par type de culture et du economic_error_usd_ha sur notre meilleur modèle**
+
+- Nous avons vu dans la partie exploratoire un déséquilibre assez fort entre certains type de culture et le rendement. Par exemple on a noté la présence de gros rendement qur la catégorie des pommes de terre. Ces gros écart tirent les erreurs du MAE vers le haut.
+
+<img width="428" height="402" alt="Image" src="https://github.com/user-attachments/assets/d12e1acd-b4eb-49c1-9ab5-333013ff74ae" />
+
+On remarque que les erreurs sont variables entre type de culture, on note par exemple qu'en kg/ha c'est la catégorie avec les plus gros rendements qui a le plus d'erreur.
+
+
+- Au-delà des métriques de modélisation classiques, une métrique métier a été introduite : `economic_error_usd_ha`.Pour le meilleur modèle retenu, cette erreur est estimée à **273,7 USD/ha**. Le coût n'est pas négligeable selon la taille des champs mais cela reste une estimation et elle est la plus optimsiée pour le moment. C’est très utile pour un exploitant agricole, parce qu’on traduit l’erreur de prédiction en impact financier moyen par hectare. Donc on peut répondre non seulement à “le modèle est-il précis ?”, mais surtout à :
+    - combien coûte une mauvaise estimation de rendement
+    - si une recommandation est économiquement exploitable
+
+- Le Random Forest présente le meilleur compromis entre précision, stabilité et interprétabilité.
+
+### Comparaison des performances des modèles sur le fichier consolidé et le fichier enrichi
+
+
+<img width="707" height="765" alt="Image" src="https://github.com/user-attachments/assets/1a36ec71-d4b9-471c-a34f-f77f3a9061d1" />
+
+Un second dataset a été construit en enrichissant le fichier consolidé avec des variables proxy issues du fichier `crop_yield`.  
+L’objectif était d’évaluer si cet enrichissement permettait d’améliorer la capacité de généralisation des modèles.
+
+Les résultats obtenus montrent toutefois que cet enrichissement n’apporte pas de gain mesurable sur les performances, et peut même légèrement dégrader certaines métriques.  
+
+Ce résultat suggère que :
+- soit les variables ajoutées ne contiennent pas d’information suffisamment discriminante,
+- soit leur caractère indirect / approximatif limite leur contribution au modèle.
+
+Le choix final s’est donc porté sur le **dataset consolidé sans enrichissement**, afin de privilégier un pipeline plus simple et plus robuste.
+
+### Optimisation des hyperparamètres
+
+Le **RandomForestRegressor** a été retenu comme modèle final pour trois raisons principales :
+
+1. Il obtient les meilleures performances globales sur le dataset consolidé.
+2. Il présente une bonne stabilité en validation croisée, avec une faible variabilité entre les folds.
+3. Il offre un bon niveau d’interprétabilité via les analyses de feature importance et SHAP.
+
+Ce choix répond donc à un compromis équilibré entre **performance prédictive**, **robustesse** et **lisibilité métier**.
+
+Une phase d’optimisation par `GridSearchCV` a été menée sur ce dernier.  
+
+Les meilleurs hyperparamètres retenus sont les suivants (en comparaison avec la baseline):
+
+<img width="683" height="213" alt="Image" src="https://github.com/user-attachments/assets/41e9e461-1af9-40e7-995a-243cf86e069a" />
+
+Les gains observés après optimisation restent toutefois limités.  
+Ce comportement suggère que le modèle se situe déjà proche de son optimum sur les données disponibles. En conséquence, les marges de progression futures semblent davantage liées à l’enrichissement des données qu’à une optimisation algorithmique supplémentaire.
+
+
 

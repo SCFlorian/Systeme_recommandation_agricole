@@ -11,13 +11,13 @@ import os
 from dotenv import load_dotenv
 from huggingface_hub import hf_hub_download
 
-# Charge les variables du fichier .env s'il existe (utile en local)
+# Charge les variables du fichier .env 
 load_dotenv() 
 
-# Récupère la clé (Cherche dans le .env en local, ou dans les Secrets sur HF)
+# Récupère la clé 
 token = os.getenv("HF_TOKEN")
 
-# On importe ta fonction de nettoyage
+# On importe la fonction de nettoyage
 from scripts.data_cleaning import preparation_yield_df_inference
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -31,7 +31,7 @@ def load_remote_pipeline():
     REPO_ID = "FLORIANSC/yield-prediction-model" 
     FILENAME = "randomforest_best_pipeline.joblib"
     
-    # On vérifie si on est en local (pour tes tests) ou sur le Space
+    # On vérifie si on est en local ou sur le Space
     if os.path.exists(FILENAME):
         logging.info("Chargement du modèle local.")
         return joblib.load(FILENAME)

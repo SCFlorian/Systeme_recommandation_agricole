@@ -15,7 +15,7 @@ COPY pyproject.toml poetry.lock* ./
 # Installation des librairies
 RUN poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi --no-root
 
-# Copie du reste du code (les datasets et modèles sont ignorés via .gitignore)
+# Copie du reste du code
 COPY . .
 
 # Port exposé par Hugging Face
