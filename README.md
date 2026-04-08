@@ -796,5 +796,84 @@ Les meilleurs hyperparamètres retenus sont les suivants (en comparaison avec la
 Les gains observés après optimisation restent toutefois limités.  
 Ce comportement suggère que le modèle se situe déjà proche de son optimum sur les données disponibles. En conséquence, les marges de progression futures semblent davantage liées à l’enrichissement des données qu’à une optimisation algorithmique supplémentaire.
 
+## Interprétabilité du modèle : feature importance et SHAP values
 
+Afin de mieux comprendre les mécanismes de prédiction du modèle retenu, deux approches complémentaires d’interprétabilité ont été utilisées :
+- la feature importance native du Random Forest
+- les SHAP values, qui permettent d’analyser la contribution réelle de chaque variable aux prédictions.
 
+Ces deux lectures ne mesurent pas exactement la même chose :
+
+- la feature importance indique quelles variables sont le plus utilisées par le modèle pour réduire l’erreur lors des splits
+- les SHAP values montrent dans quel sens et avec quelle intensité chaque variable fait varier une prédiction.
+
+L’intérêt de croiser les deux approches est de distinguer :
+- les variables structurellement importantes pour le modèle 
+- les variables qui ont l’impact le plus fort sur les prédictions individuelles.
+
+1. **Feature importance globale du Random Forest**
+
+- Top 15 des variables les plus importantes :
+
+<img width="989" height="590" alt="Image" src="https://github.com/user-attachments/assets/d002baf4-cef7-42e4-85ff-91ca443fbed0" />
+
+La variable la plus importante est de très loin item_Potatoes, avec un poids supérieur à 31 %. Cela signifie que le fait d’être sur la culture Potatoes structure fortement les décisions du modèle. Ce résultat est cohérent avec l’analyse exploratoire, qui montrait déjà que certaines cultures, notamment les pommes de terre, présentaient des niveaux de rendement beaucoup plus élevés que les autres.
+
+On observe ensuite un second bloc de variables très influentes :
+pesticides_tonnes
+rainfall_mm
+input_imbalance
+avg_temp
+thermal_stress
+years_from_now
+Ce groupe montre que le modèle ne repose pas uniquement sur le type de culture : il intègre aussi fortement les conditions agro-climatiques, les intrants et une dimension temporelle.
+Enfin, plusieurs variables de région apparaissent dans le top 15, ce qui confirme que le contexte géographique joue un rôle significatif dans l’estimation des rendements.
+
+2. Importance par familles de variables
+
+Pour rendre l’analyse plus lisible métier, les variables ont été regroupées en grandes familles.
+
+<img width="790" height="390" alt="Image" src="https://github.com/user-attachments/assets/89b56b1b-4611-4934-a877-9fa4cf6600d7" />
+
+- Le modèle s’appuie d’abord sur le type de culture, qui représente près de 49,4 % de l’importance totale. C’est le signal principal.
+- Les variables climatiques et techniques représentent ensuite environ 34% de l’importance totale. Cela montre que la prédiction ne dépend pas uniquement du choix de culture, mais aussi des conditions de production : pluie, température, pression d’intrants et déséquilibres entre eau et pesticides.
+- La région pèse environ 16,6 %, ce qui confirme qu’un même type de culture ne se comporte pas de la même manière selon le contexte géographique.
+- Cette répartition est cohérente d’un point de vue métier :
+    - la culture fixe un potentiel de rendement de base
+    - le climat et les intrants modulent ce potentiel
+    - la zone géographique ajoute un effet structurel supplémentaire.
+
+3. Analyse des SHAP values
+
+L’analyse SHAP affine cette lecture en montrant non seulement quelles variables comptent le plus, mais aussi dans quel sens elles influencent la prédiction.
+
+**Variables les plus influentes selon SHAP**
+Les variables ressortant le plus fortement en contribution moyenne absolue sont :
+
+<img width="784" height="940" alt="Image" src="https://github.com/user-attachments/assets/6fb6d2f9-146a-4e62-9ff0-d56fb0c5f23a" />
+
+- Les SHAP values confirment que certaines cultures déplacent fortement la prédiction :
+    - item_Potatoes a l’effet positif le plus fort du modèle
+    - item_Sweet potatoes, item_Cassava, item_Yams et item_Plantains and others ont également des contributions positives marquées 
+    - à l’inverse, des cultures comme item_Soybean, item_Sorghum ou item_Wheat apparaissent davantage associées à des contributions négatives ou plus faibles.
+    - Le modèle apprend qu’à conditions comparables, certaines cultures sont associées à des niveaux de rendement structurellement plus élevés que d’autres.
+
+- Les SHAP values montrent aussi des effets géographiques différenciés :
+    - region_Sub-Saharan Africa contribue fréquemment négativement aux prédictions ;
+    - region_Western Europe, region_Western Asia, region_Northern Europe et region_Eastern Asia ont plutôt des contributions positives.
+
+- Effet du climat et de l'intrant. Plusieurs variables numériques ont un rôle important :
+    - pesticides_tonnes : les valeurs élevées tendent globalement à pousser la prédiction vers le haut
+    - rainfall_mm : son effet est important mais dépend du contexte
+    - avg_temp : la température moyenne influence bien la prédiction, mais avec une intensité plus modérée que la pluie ou les pesticides
+    - thermal_stress : un stress thermique élevé a plutôt un effet négatif
+    - years_from_now : les valeurs élevées de cette variable, correspondant aux années les plus anciennes, ont tendance à tirer la prédiction vers le bas, tandis que les années plus récentes contribuent davantage positivement.
+        Le modèle capte une tendance dans le temps avec l’idée d’une amélioration progressive des rendements au fil du temps, possiblement liée à l’évolution des pratiques, des intrants, des techniques ou des variétés.
+
+4. Analyse d'une prédiction avec waterfall plot
+
+Cela part d'une prédiction moyenne du modèle sur le dataset d'entraînement, ensuite selon les contributions de certaines variables, le modèle va pousser la prédiction vers le haut ou vers le bas.
+
+<img width="1008" height="600" alt="Image" src="https://github.com/user-attachments/assets/3ebbe111-a79a-4ec1-94f1-14e7e53d9086" />
+
+Dans ce cas précis on voit qu'une large partie de la contribution positive du model vient de la catégorie plantains and others et dans une moindre mesure la variable des pesticides. Les autres variables vont pousser la prédiction vers le bas.
