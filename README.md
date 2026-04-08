@@ -18,6 +18,7 @@ pinned: false
 5. [Feature engineering sur le fichier enrichi](#feature-engineering-sur-le-fichier-enrichi)
 6. [Feature engineering sur le fichier consolidé](#feature-engineering-sur-le-fichier-consolidé)
 7. [Modélisation](#modélisation)
+8. [Interprétabilité du modèle : feature importance et SHAP values](#interprétabilité-du-modèle-:-feature-importance-et-shap-values)
 
 ## Présentation
 
@@ -672,11 +673,11 @@ On a testé 5 modèles différents :
 ### Résultats des performances sur le fichier consolidé
 
 Les expérimentations montrent que les modèles d’arbres surpassent nettement les baselines simples.  
-Le **RandomForestRegressor** obtient les meilleures performances globales sur le dataset consolidé, avec un **R² test de 0,9425**, un **RMSE de 1729,7 kg/ha** et un **MAE de 796,5 kg/ha**.  
+Le **RandomForestRegressor** obtient les meilleures performances globales sur le dataset consolidé, avec un **R² test de 0,9436**, un **RMSE de 1712,47 kg/ha** et un **MAE de 804.54 kg/ha**.  
 
 L’enrichissement du dataset à partir du fichier `crop_yield` n’a pas permis d’améliorer les performances de manière significative. Le choix final s’est donc porté sur le **dataset consolidé sans enrichissement**, plus simple, plus lisible et tout aussi performant.
 
-**Dans le détail** 
+#### **Dans le détail** 
 
 **Sur les 2 modèles "simples"**
 - Sur le DummyRegressor et le LinearRegression les résultats ne sont pas bons, c'était attendu. Le Dummy nous sert comme base pour comparer et nous ne sommes pas face à une distribution linéaire alors LinearRegression ne généralise pas bien. Les modèles linéaires montrent leurs limites sur ce problème, ce qui confirme la présence de relations non linéaires entre les variables explicatives et le rendement.
@@ -714,7 +715,7 @@ Test economic_error_usd_ha : 1033.3629
 
 Les modèles d’arbres obtiennent des performances nettement supérieures aux modèles de référence.
 
-Par exemple le RandomForest a "seulement" 17% d'erreur en valeur absolue, en comparaison d'un erreur sur 2 pour le LGBMRegressor.
+Par exemple le RandomForest a "seulement" 17% d'erreur en valeur absolue, en comparaison d'une erreur sur 2 pour le LGBMRegressor.
 
 
 **Petit focus sur ces 2 modèles**
@@ -729,7 +730,7 @@ Test R2   : 0.9425
 Test MAE  : 796.4869
 Test economic_error_usd_ha : 273.6834
 ```
-- Sur la validation croisée on voit que l'écart-type entrent les différents folds est petit, les résultats restent stables.
+- Sur la validation croisée on voit que l'écart-type entre les différents folds est petit, les résultats restent stables.
 - Le MAE peut est à 796 par kg/ha sur le test. Cela peut sembler haut mais il faut prendre en compte le contexte métier ici où on sait que les rendements dépendent de beaucoup de facteurs et que les prédictions sont à ajuster avec sa connsaissance terrain.
 
 
@@ -748,14 +749,17 @@ Test economic_error_usd_ha : 406.6547
 
 **Analyse du MAE par type de culture et du economic_error_usd_ha sur notre meilleur modèle**
 
-- Nous avons vu dans la partie exploratoire un déséquilibre assez fort entre certains type de culture et le rendement. Par exemple on a noté la présence de gros rendement qur la catégorie des pommes de terre. Ces gros écart tirent les erreurs du MAE vers le haut.
+- Nous avons vu dans la partie exploratoire un déséquilibre assez fort entre certains type de culture et le rendement. Par exemple on a noté la présence de gros rendement sur la catégorie des pommes de terre. Ces gros écart tirent les erreurs du MAE vers le haut.
 
 <img width="428" height="402" alt="Image" src="https://github.com/user-attachments/assets/d12e1acd-b4eb-49c1-9ab5-333013ff74ae" />
 
 On remarque que les erreurs sont variables entre type de culture, on note par exemple qu'en kg/ha c'est la catégorie avec les plus gros rendements qui a le plus d'erreur.
 
 
-- Au-delà des métriques de modélisation classiques, une métrique métier a été introduite : `economic_error_usd_ha`.Pour le meilleur modèle retenu, cette erreur est estimée à **273,7 USD/ha**. Le coût n'est pas négligeable selon la taille des champs mais cela reste une estimation et elle est la plus optimsiée pour le moment. C’est très utile pour un exploitant agricole, parce qu’on traduit l’erreur de prédiction en impact financier moyen par hectare. Donc on peut répondre non seulement à “le modèle est-il précis ?”, mais surtout à :
+- Au-delà des métriques de modélisation classiques, une métrique métier a été introduite : `economic_error_usd_ha`.
+
+- Pour le meilleur modèle retenu, cette erreur est estimée à **273,7 USD/ha**. Le coût n'est pas négligeable selon la taille des champs mais cela reste une estimation et elle est la plus optimisée pour le moment. 
+- C’est très utile pour un exploitant agricole, parce qu’on traduit l’erreur de prédiction en impact financier moyen par hectare. Donc on peut répondre non seulement à “le modèle est-il précis ?”, mais surtout à :
     - combien coûte une mauvaise estimation de rendement
     - si une recommandation est économiquement exploitable
 
