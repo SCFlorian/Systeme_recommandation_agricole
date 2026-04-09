@@ -13,12 +13,16 @@ pinned: false
 
 1. [Présentation](#présentation)
 2. [Organisation](#organisation)
-3. [Analyse exploratoire des fichiers sources](#analyse-exploratoire-des-fichiers-sources)
-4. [Enrichissement du fichier consolidé](#enrichissement-du-fichier-consolidé)
-5. [Feature engineering sur le fichier enrichi](#feature-engineering-sur-le-fichier-enrichi)
-6. [Feature engineering sur le fichier consolidé](#feature-engineering-sur-le-fichier-consolidé)
-7. [Modélisation](#modélisation)
-8. [Interprétabilité du modèle feature importance et SHAP values](#interprétabilité-du-modèle-feature-importance-et-shap-values)
+3. [Fonctionnalités](#fonctionnalités)
+3. [Prérequis](#prérequis)
+4. [Installation](#installation)
+5. [Analyse exploratoire des fichiers sources](#analyse-exploratoire-des-fichiers-sources)
+6. [Enrichissement du fichier consolidé](#enrichissement-du-fichier-consolidé)
+7. [Feature engineering sur le fichier enrichi](#feature-engineering-sur-le-fichier-enrichi)
+8. [Feature engineering sur le fichier consolidé](#feature-engineering-sur-le-fichier-consolidé)
+9. [Modélisation](#modélisation)
+10. [Interprétabilité du modèle feature importance et SHAP values](#interprétabilité-du-modèle-feature-importance-et-shap-values)
+11. [Perspectives](#perspectives)
 
 ## Présentation
 
@@ -39,30 +43,100 @@ Nous avons eu à disposition deux datasets :
     - yield_df.csv
     - yield.csv
 
-## Organisation
 
+## Organisation
 ```
+├── .github/workflows/                         # Configuration de la CI/CD
+│   ├──cicd.yaml
 ├── data/                                      # Dossier contenant nos fichiers csv bruts et transformés
 │   └── processed/                             # Création des nouveaux fichiers csv 
-│       ├──yield_df_final.csv                
+│       ├──yield_df_final.csv
+│       ├──yield_df_enriched.csv                  
 │   └── raw/                                   # Les éléments de base du projet
-│       ├──crop_yield.csv                      
-│       ├──pesticides.csv                       
+│       ├──crop_yield.csv
+│       ├──FAOSTAT_data_en_4-6-2026.csv        # Fichier pour récupérer les régions                 
+│       ├──pesticides.csv                      
 │       ├──rainfall.csv                   
-│       ├──temp.csv                     
-│       ├──yield.csv                   
-├── scripts/                                   # Scripts généraux
-│   ├──config.py                         
-│   ├──data_cleaning.py               
+│       ├──temp.csv 
+│       ├──UNSD — Methodology.csv              # Fichier pour récupérer les prix par type de culture
+│       ├──yield.csv   
+├── model/                                     # Dossier contenant le meilleur modèle retenu
 ├── notebooks/                                 # Notebook & dossier graph
 │   ├──notebook_analyse_exploratoire.ipynb
 │   ├──notebook_feature_engineering.ipynb
-│   ├──graph                                           
+│   ├──notebook_feature_modelisation.ipynb
+│   ├──graph
+├── scripts/                                   # Scripts généraux
+│   ├──config.py                         
+│   ├──data_cleaning.py 
+│   ├──preprocessing_pipeline.py
+├── tests/                                     # Tests unitaires et fonctionnels
+│   ├──test_endpoint.py                         
+│   ├──test_logic.py 
+│   test_simple.py
+├── .env                                       # Code secret HF pas versionné 
 ├── .gitignore                                 # Permet de ne pas afficher les éléments sélectionnés sur GitHub
+├── app.py                                     # L'application FastAPI
+├── Dockerfile                                 # Description étape pour création d'une image de conteneur
 ├── poetry.lock                                # Pas versionné sur Git
 ├── pyproject.toml                             # Gestion des dépendances Poetry
 ├── README.md                                  # Documentation du projet
+├── streamlit.py                               # Interface du projet
 ```
+## Fonctionnalités
+
+- Pipeline ML de bout en bout
+- Tracking des expérimentations avec MLFlow
+- API en local avec FastAPI
+- Déploiement de l'interface sur Hugging Face Spaces
+- Hebergement du model de ML sous Hugging Face Models
+- Interface avec streamlit
+- 1 fonction de prédiction et 1 fonction de recommandation
+
+## Prérequis
+
+- Python 3.12+
+- Avoir un compte sur Hugging Face
+- Token Hugging Face (se diriger vers https://huggingface.co/settings)
+- Avoir le token HF sur Github et Hugging Face afin de créer le lien entre eux
+
+## Installation
+
+1. **Cloner le dépôt**
+
+```
+git clone git@github.com:SCFlorian/Systeme_recommandation_agricole.git
+cd Systeme_recommandation_agricole
+```
+
+2. **Installez les dépendances : Le projet utilise pyproject.toml pour la gestion des dépendances :**
+```
+poetry install --no-root
+```
+3. **Ouvrir le projet dans VS Code :**
+```
+code .
+```
+4. **Configurez l’environnement Python dans VS Code**
+    1.	Installez l’extension Python (si ce n’est pas déjà fait).
+    2.	Appuyez sur Ctrl+Shift+P (Windows/Linux) ou Cmd+Shift+P (Mac).
+    4.	Recherchez “Python: Select Interpreter”.
+    5.	Sélectionnez l’environnement créé par Poetry ou celui dans lequel tu as installé le projet.
+
+5. **Configurez le token Hugging Face**
+
+Créez un fichier `.env` à la racine du projet avec le contenu suivant :
+
+```
+HF_TOKEN=votre_token_hf
+```
+
+6. Génération d'un modèle depuis le notebook de modélisation
+    1. Enregistrement du modèle retenu avec joblib
+    2. Déposez le modèle dans votre compte HF dans models
+    3. Changez dans config le nom de votre repo HF pour effectuer les bons liens
+7. Génération de l'interface
+    - Push sur main et le déploiement s'effectue
 
 ## Analyse exploratoire des fichiers sources
 
@@ -758,7 +832,9 @@ On remarque que les erreurs sont variables entre type de culture, on note par ex
 
 - Au-delà des métriques de modélisation classiques, une métrique métier a été introduite : `economic_error_usd_ha`.
 
-- Pour le meilleur modèle retenu, cette erreur est estimée à **273,7 USD/ha**. Le coût n'est pas négligeable selon la taille des champs mais cela reste une estimation et elle est la plus optimisée pour le moment. 
+<img width="1200" height="600" alt="Image" src="https://github.com/user-attachments/assets/566411aa-95aa-4b04-9cf5-13a91fc68ac8" />
+
+- Pour le meilleur modèle, cette erreur est estimée à **273,7 USD/ha**. Le coût n'est pas négligeable selon la taille des champs mais cela reste une estimation et elle est la plus optimisée pour le moment. 
 - C’est très utile pour un exploitant agricole, parce qu’on traduit l’erreur de prédiction en impact financier moyen par hectare. Donc on peut répondre non seulement à “le modèle est-il précis ?”, mais surtout à :
     - combien coûte une mauvaise estimation de rendement
     - si une recommandation est économiquement exploitable
@@ -824,12 +900,13 @@ L’intérêt de croiser les deux approches est de distinguer :
 La variable la plus importante est de très loin item_Potatoes, avec un poids supérieur à 31 %. Cela signifie que le fait d’être sur la culture Potatoes structure fortement les décisions du modèle. Ce résultat est cohérent avec l’analyse exploratoire, qui montrait déjà que certaines cultures, notamment les pommes de terre, présentaient des niveaux de rendement beaucoup plus élevés que les autres.
 
 On observe ensuite un second bloc de variables très influentes :
-pesticides_tonnes
-rainfall_mm
-input_imbalance
-avg_temp
-thermal_stress
-years_from_now
+- pesticides_tonnes
+- rainfall_mm
+- input_imbalance
+- avg_temp
+- thermal_stress
+- years_from_now
+
 Ce groupe montre que le modèle ne repose pas uniquement sur le type de culture : il intègre aussi fortement les conditions agro-climatiques, les intrants et une dimension temporelle.
 Enfin, plusieurs variables de région apparaissent dans le top 15, ce qui confirme que le contexte géographique joue un rôle significatif dans l’estimation des rendements.
 
@@ -881,3 +958,13 @@ Cela part d'une prédiction moyenne du modèle sur le dataset d'entraînement, e
 <img width="1008" height="600" alt="Image" src="https://github.com/user-attachments/assets/3ebbe111-a79a-4ec1-94f1-14e7e53d9086" />
 
 Dans ce cas précis on voit qu'une large partie de la contribution positive du model vient de la catégorie plantains and others et dans une moindre mesure la variable des pesticides. Les autres variables vont pousser la prédiction vers le bas.
+
+## Perpsectives
+
+Les résultats pour la fonction de prédiction et de recommandation sont cohérents par rapport au dataset utilisé, c'est à dire un fichier déséquilibré par type de culture. Actuellement nous sommes capable de donner un rendement par une culture spécifique mais également de propsoer un classement des rendements les plus profitables à partir des conditions climatiques et de la région.
+
+Pour aller plus loin nous aurons besoin de pouvoir enrichir nos données de manière plus précise. Actuellement le dataset enrichi n'est pas utilisé car les variables rajoutées n'apportent rien au modèle. Nous avons donc besoin :
+
+- d'éléments similaires à crop_yield mais non synthétique où il serait possible de rapprocher ces informations par région ou pays.
+- avoir des éléments supplémentaires sur les parcelles 
+- d'aller plus loin dans les fonctions de prédiction et de proposer un CA potentiel / ajout d'un prix de vente par pays/région

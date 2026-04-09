@@ -1,4 +1,6 @@
+# ===================
 # Fichiers à ignorer
+# ===================
 
 # CSV
 crop_yield.csv
@@ -7,50 +9,33 @@ harmonization_data/
 yield_df_final_conso.csv
 UNSD — Methodology.csv
 crop_yield_conso.csv
-data/processed/yield_df_enriched_ready.csv
-data/processed/yield_df_final_conso_encoded_test.csv
-data/processed/yield_df_final_conso_ready.csv
 data/raw/FAOSTAT_data_en_4-6-2026.csv
 data/processed/yield_df_enriched_conso.csv
+feature_importance_random_forest.csv
 
 # Notebooks
-notebook_analyse_exploratoire copy.ipynb
-notebook_pca.ipynb
-notebook_analyse_exploratoire_old.ipynb
-notebook_feature_engineering copy.ipynb
 notebook_feature_engineering copy 2.ipynb
-notebook_feature_engineering copy 3.ipynb
-notebook_modelisation copy.ipynb
-notebooks/notebook_modelisation copy 2.ipynb
-notebooks/yield_df_cleaned_final.csv
-notebook_modelisation copy 3.ipynb
 __init__.py
-.pytest_cache
-# Dossier
-.vscode
 
 # Annexe
 .DS_Store
 poetry.lock
-
-# Cache
+.vscode
+.pytest_cache
 __pycache__
-
-# Scripts
-data_cleaning_global.py
-feature_engineering.py
+.envnotebooks/graph/
+.env
+analyse_extremes_agricoles.png
+graph/
+pdf-style.css
 
 # MLFlow
 mlruns/
 artifacts/
 mlflow.db
 mlflow.py
-feature_importance_random_forest.csv
 
+# Model
+model
 model/*.joblib
 *.joblib
-
-.envnotebooks/graph/
-.env
-analyse_extremes_agricoles.png
-graph/
