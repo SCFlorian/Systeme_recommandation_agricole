@@ -20,7 +20,6 @@ token = os.getenv("HF_TOKEN")
 
 # On importe la fonction de nettoyage
 from scripts.data_cleaning import preparation_yield_df_inference
-from scripts.config import (REGIONS, ITEMS)
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -50,6 +49,8 @@ try:
 except Exception as e:
     logging.error(f"Erreur critique de chargement du modèle : {e}")
     pipeline = None
+
+from scripts.config import (REGIONS, ITEMS)
 
 class InputPrediction(BaseModel):
     region: REGIONS
