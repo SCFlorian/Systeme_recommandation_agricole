@@ -29,6 +29,7 @@ analyse_extremes_agricoles.png
 graph/
 pdf-style.css
 rapport_metier.md
+rapport_metier.pdf
 
 # MLFlow
 mlruns/
