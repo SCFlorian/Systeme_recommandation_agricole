@@ -4,9 +4,10 @@ import pandas as pd
 import uvicorn
 import os
 from huggingface_hub import hf_hub_download
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
 import os
 from dotenv import load_dotenv
 from huggingface_hub import hf_hub_download
@@ -19,6 +20,7 @@ token = os.getenv("HF_TOKEN")
 
 # On importe la fonction de nettoyage
 from scripts.data_cleaning import preparation_yield_df_inference
+from scripts.config import (REGIONS, ITEMS)
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -50,19 +52,20 @@ except Exception as e:
     pipeline = None
 
 class InputPrediction(BaseModel):
-    region: str
-    item: str
-    avg_temp: float
-    rainfall_mm: float
-    pesticides_tonnes: float
+    region: REGIONS
+    item: ITEMS
+    avg_temp: float = Field(..., json_schema_extra={"example": 15.5})
+    rainfall_mm: float = Field(..., json_schema_extra={"example": 500.0})
+    pesticides_tonnes: float = Field(..., json_schema_extra={"example": 100.0})
 
 
 class InputRecommendation(BaseModel):
-    region: str
-    avg_temp: float
-    rainfall_mm: float
-    pesticides_tonnes: float
+    region: REGIONS
+    avg_temp: float = Field(..., json_schema_extra={"example": 15.5})
+    rainfall_mm: float = Field(..., json_schema_extra={"example": 500.0})
+    pesticides_tonnes: float = Field(..., json_schema_extra={"example": 100.0})
 
+# Gestion des erreurs 404
 
 @app.exception_handler(404)
 async def custom_404_handler(request: Request, exc):
@@ -75,7 +78,24 @@ async def custom_404_handler(request: Request, exc):
             "suggestion": "Essayez plutôt /predict ou /health"
         }
     )
-
+# Gestion des erreurs 422
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    errors = exc.errors()
+    # On logue l'erreur précise pour le Lead Data Scientist
+    logging.error(f"Erreur de validation Pydantic : {errors}")
+    
+    return JSONResponse(
+        status_code=422,
+        content={
+            "error_code": 422,
+            "message": "Données d'entrée invalides (Schéma Pydantic)",
+            "details": [
+                {"champ": err["loc"][-1], "message": err["msg"], "type_attendu": err["type"]} 
+                for err in errors
+            ]
+        }
+    )
 
 @app.get("/health")
 def health_check():
