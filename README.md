@@ -701,6 +701,10 @@ Suivi de la modélisation avec des pratiques de MLOps, nous utilisons **MLFlow**
 - un suivi MLFlow de 5 modèles sur le fichier consolidé avec enrichissement
 - un suivi MLFlow pour l'optimisation des hyperparamètres du modèle retenu
 
+### Schéma MLOPs
+
+<img width="1028" height="523" alt="Image" src="https://github.com/user-attachments/assets/6ed0d34a-02ec-4e66-8bb8-ea0f8cb1d1af" />
+
 ### Choix des modèles
 
 On a testé 5 modèles différents :
