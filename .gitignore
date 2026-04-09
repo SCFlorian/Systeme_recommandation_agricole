@@ -28,6 +28,7 @@ __pycache__
 analyse_extremes_agricoles.png
 graph/
 pdf-style.css
+rapport_metier.md
 
 # MLFlow
 mlruns/

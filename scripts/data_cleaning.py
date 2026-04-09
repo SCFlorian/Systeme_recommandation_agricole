@@ -8,8 +8,6 @@ import sys, os
 import logging
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from scripts.config import (csv_yield_conso, csv_yield_enriched, csv_file_crop_yield_clean)
-
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Les 2 fonctions suivantes corrrespondent à la préparation du fichier avant encodage et séparation du split X,y

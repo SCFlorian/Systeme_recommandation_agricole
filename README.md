@@ -940,7 +940,7 @@ Les variables ressortant le plus fortement en contribution moyenne absolue sont 
     - Le modèle apprend qu’à conditions comparables, certaines cultures sont associées à des niveaux de rendement structurellement plus élevés que d’autres.
 
 - Les SHAP values montrent aussi des effets géographiques différenciés :
-    - region_Sub-Saharan Africa contribue fréquemment négativement aux prédictions ;
+    - region_Sub-Saharan Africa contribue fréquemment négativement aux prédictions
     - region_Western Europe, region_Western Asia, region_Northern Europe et region_Eastern Asia ont plutôt des contributions positives.
 
 - Effet du climat et de l'intrant. Plusieurs variables numériques ont un rôle important :
@@ -959,7 +959,7 @@ Cela part d'une prédiction moyenne du modèle sur le dataset d'entraînement, e
 
 Dans ce cas précis on voit qu'une large partie de la contribution positive du model vient de la catégorie plantains and others et dans une moindre mesure la variable des pesticides. Les autres variables vont pousser la prédiction vers le bas.
 
-## Perpsectives
+## Perspectives
 
 Les résultats pour la fonction de prédiction et de recommandation sont cohérents par rapport au dataset utilisé, c'est à dire un fichier déséquilibré par type de culture. Actuellement nous sommes capable de donner un rendement par une culture spécifique mais également de propsoer un classement des rendements les plus profitables à partir des conditions climatiques et de la région.
 
