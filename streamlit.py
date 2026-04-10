@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import pandas as pd
 
 # Configuration des URL
 API_URL_PREDICT = "http://localhost:8000/predict"
@@ -77,9 +78,21 @@ with tab2:
                 res = requests.post(API_URL_RECO, json=payload_r)
                 res.raise_for_status()
                 data = res.json()
+
+                # Préparation des données pour le graphique
+                df_reco = pd.DataFrame(data['ranking'])
+                df_reco = df_reco.set_index('crop')
+                df_reco = df_reco.sort_values(by='predicted_yield', ascending=False)
+
                 st.success(f"🏆 La meilleure culture est : **{data['best_crop']}**")
-                # Optionnel : afficher le classement
+                # Afficher le classement
                 st.write("Classement complet :")
                 st.table(data['ranking'])
+
+                # Affichage du graphique 
+                st.subheader("📊 Comparaison des rendements (kg/ha)")
+                st.bar_chart(df_reco)
+
         except Exception as e:
             st.error(f"Erreur : {e}")
+
