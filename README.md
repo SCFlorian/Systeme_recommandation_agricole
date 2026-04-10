@@ -22,7 +22,8 @@ pinned: false
 8. [Feature engineering sur le fichier consolidé](#feature-engineering-sur-le-fichier-consolidé)
 9. [Modélisation](#modélisation)
 10. [Interprétabilité du modèle feature importance et SHAP values](#interprétabilité-du-modèle-feature-importance-et-shap-values)
-11. [Perspectives](#perspectives)
+11. [Pipeline CI/CD](#pipeline-ci-/-cd)
+12. [Perspectives](#perspectives)
 
 ## Présentation
 
@@ -696,7 +697,7 @@ Dans la phase d'analyse exploratoire et de prétraitement, nous avons fait le ch
 - dataset consolidé sans enrichissement
 - dataset consolidé avec enrichissement (à l'aide du fichier crop_yield)
 
-Suivi de la modélisation avec des pratiques de MLOps, nous utilisons **MLFlow** pour suivre les expérimentations. L'ensemble des tests ont été réalisé dans le notebook dédié à la modélisation. À l'intérieur on va retouver plusieurs blocs :
+Pour le suivi de la modélisation avec des pratiques de MLOps, nous utilisons **MLFlow** pour suivre les expérimentations. L'ensemble des tests ont été réalisé dans le notebook dédié à la modélisation. À l'intérieur on va retouver plusieurs blocs :
 - un suivi MLFlow de 5 modèles sur le fichier consolidé
 - un suivi MLFlow de 5 modèles sur le fichier consolidé avec enrichissement
 - un suivi MLFlow pour l'optimisation des hyperparamètres du modèle retenu
@@ -746,7 +747,8 @@ On a testé 5 modèles différents :
 - Erreur quadratique moyenne (RMSE) : mesure l'erreur moyenne en donnant plus de poids aux grosses erreurs.
 - Erreur absolue moyenne (MAE) : moyenne des erreurs en valeur absolue
 - Erreur relative (MAPE) : erreur en pourcentage
-- Erreur économique (economic_error_usd_ha) : c'ets une métrique métier personnalisée, elle convertit l'erreur de prédiction en perte financière par hectare
+- Erreur économique (economic_error_usd_ha) : c'est une métrique métier personnalisée, elle convertit l'erreur de prédiction en perte financière par hectare
+    - Nous avons récupéré les prix par tonne au niveau mondial pour chaque type de culture pour l'année de 2016 (dernière année de notre dataset)
 
 ### Résultats des performances sur le fichier consolidé
 
