@@ -22,7 +22,7 @@ pinned: false
 8. [Feature engineering sur le fichier consolidé](#feature-engineering-sur-le-fichier-consolidé)
 9. [Modélisation](#modélisation)
 10. [Interprétabilité du modèle feature importance et SHAP values](#interprétabilité-du-modèle-feature-importance-et-shap-values)
-11. [Pipeline CI/CD](#pipeline-ci-/-cd)
+11. [Pipeline CI CD](#pipeline-ci-cd)
 12. [Perspectives](#perspectives)
 
 ## Présentation
@@ -965,11 +965,66 @@ Cela part d'une prédiction moyenne du modèle sur le dataset d'entraînement, e
 
 Dans ce cas précis on voit qu'une large partie de la contribution positive du model vient de la catégorie plantains and others et dans une moindre mesure la variable des pesticides. Les autres variables vont pousser la prédiction vers le bas.
 
-## Pipeline CI/CD
+## Pipeline CI CD
+
+Ce workflow GitHub Actions automatise les tests et le déploiement de l'application AgriTech Interface vers les Hugging Face Spaces.
 
 <img width="1166" height="462" alt="Image" src="https://github.com/user-attachments/assets/b96728bb-bc51-4593-b2df-a9e7d8ad9d0e" />
 
-Lors d'un push sur notre branche main, le projet sera deployé sur Hugging Face Spaces en s'appuyant sur une image conteneurisé de notre projet en s'appuyant notamment sur notre API et notre interface Streamlit.
+**Objectifs du workflow**
+
+Le but est de garantir que chaque modification poussée sur la branche principale est testée et immédiatement mise en ligne, assurant ainsi une intégration et un déploiement continus (CI/CD).
+
+**Déclencheurs (Triggers)**
+
+Le workflow s'active automatiquement selon deux scénarios :
+- Push sur main : toute fusion ou push direct sur la branche principale.
+- Manuel : peut être lancé manuellement depuis l'onglet "Actions" de GitHub.
+
+**Étapes du Job (build-and-deploy)**
+
+Le job s'exécute sur un environnement ubuntu-latest et suit les étapes suivantes :
+
+1. Préparation de l'environnement
+
+- Checkout : récupère le code source du dépôt. L'option fetch-depth: 0 est utilisée pour obtenir tout l'historique (nécessaire pour certains outils de versioning ou déploiements git spécifiques).
+
+- Setup Python : installe Python 3.12.
+
+- Install Poetry : installe le gestionnaire de dépendances Poetry, configure le PATH et désactive la création de venv pour utiliser l'environnement global du runner.
+
+2. Gestion des dépendances & Tests
+
+- Install dependencies : installe les bibliothèques définies dans pyproject.toml.
+
+- Run Unit Tests :
+    - Installe pytest et httpx.
+    - Définit le PYTHONPATH pour inclure le répertoire racine.
+    - Exécute les tests situés dans le dossier tests/. Si les tests échouent, le déploiement est annulé.
+
+3. Déploiement (Hugging Face Spaces)
+
+Push to Hugging Face :
+
+- Ajoute le dépôt distant Hugging Face via HTTPS en utilisant un token d'authentification.
+- Force le push de la branche main locale vers le Space Hugging Face.
+
+Détection automatique du docker par Hugging Face Spaces :
+- il voit le Dockerfile
+- il va lire et reconstruite chaque ligne du Dockerfile
+- Une fois l'image construite -> interface Streamlit dans le Space
+
+**Configuration Requise (Secrets)**
+
+Pour que ce workflow fonctionne, vous devez configurer le secret suivant dans les paramètres de votre dépôt GitHub (Settings > Secrets and variables > Actions)
+
+**Notes Techniques**
+
+- Hébergement cible : huggingface.co/spaces/FLORIANSC/agritech-interface
+
+- Forçage du Push : le workflow utilise git push --force. Cela signifie que l'historique sur Hugging Face sera écrasé par celui de GitHub à chaque déploiement.
+
+- Optimisation : les dépendances sont installées sans interaction (--no-interaction) pour éviter que le runner ne reste bloqué sur une question.
 
 ## Perspectives
 
