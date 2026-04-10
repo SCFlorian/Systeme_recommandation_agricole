@@ -963,6 +963,12 @@ Cela part d'une prédiction moyenne du modèle sur le dataset d'entraînement, e
 
 Dans ce cas précis on voit qu'une large partie de la contribution positive du model vient de la catégorie plantains and others et dans une moindre mesure la variable des pesticides. Les autres variables vont pousser la prédiction vers le bas.
 
+## Pipeline CI/CD
+
+<img width="1166" height="462" alt="Image" src="https://github.com/user-attachments/assets/b96728bb-bc51-4593-b2df-a9e7d8ad9d0e" />
+
+Lors d'un push sur notre branche main, le projet sera deployé sur Hugging Face Spaces en s'appuyant sur une image conteneurisé de notre projet en s'appuyant notamment sur notre API et notre interface Streamlit.
+
 ## Perspectives
 
 Les résultats pour la fonction de prédiction et de recommandation sont cohérents par rapport au dataset utilisé, c'est à dire un fichier déséquilibré par type de culture. Actuellement nous sommes capable de donner un rendement par une culture spécifique mais également de propsoer un classement des rendements les plus profitables à partir des conditions climatiques et de la région.
