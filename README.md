@@ -1024,7 +1024,7 @@ Les variables ressortant le plus fortement en contribution moyenne absolue sont 
 
 Cela part d'une prédiction moyenne du modèle sur le dataset d'entraînement, ensuite selon les contributions de certaines variables, le modèle va pousser la prédiction vers le haut ou vers le bas.
 
-<img width="1008" height="600" alt="Image" src="https://github.com/user-attachments/assets/3ebbe111-a79a-4ec1-94f1-14e7e53d9086" />
+<img width="1154" height="600" alt="Image" src="https://github.com/user-attachments/assets/25a3bda6-3ae1-4ec8-9394-2b56a6633d8b" />
 
 Dans ce cas précis on voit qu'une large partie de la contribution positive du model vient de la catégorie cassava et dans une moindre mesure la région sud-est asiatique.
 
