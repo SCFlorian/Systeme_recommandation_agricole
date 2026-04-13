@@ -3,41 +3,91 @@ import requests
 import pandas as pd
 
 # Configuration des URL
-API_URL_PREDICT = "http://localhost:8000/predict"
-API_URL_RECO = "http://localhost:8000/recommend"
+API_URL_PREDICT = "http://localhost:7860/predict"
+API_URL_RECO = "http://localhost:7860/recommend"
 
 st.set_page_config(page_title="Agritech Predictor", layout="wide")
 
 st.title("🌾 Système de Recommandation Agricole")
 
-# Utilisation d'onglets pour séparer les deux fonctions proprement
+# Dictionnaire des infos mape à afficher dans l'encart
+infos_mape = {
+    "Maize": "25,14%",
+    "Potatoes": "14,33%",
+    "Rice": "16.94%",
+    "Wheat": "19,36%",
+    "Sorghum": "25,21%",
+    "Soybean": "21,60%",
+    "Cassava": "18.57%",
+    "Yams": "35,30%",
+    "Sweet potatoes": "21,31%",
+    "Plantains and others": "20,03%"
+}
+# Dictionnaire des infos de perte économqiue à afficher dans l'encart
+infos_economic = {
+    "Maize": "173,00 $",
+    "Potatoes": "551.50 $",
+    "Rice": "152,79 $",
+    "Wheat": "78,67 $",
+    "Sorghum": "78,55 $",
+    "Soybean": "91.73 $",
+    "Cassava": "345.05 $",
+    "Yams": "1291.69 $",
+    "Sweet potatoes": "328,36 $",
+    "Plantains and others": "329.39 $"
+}
+
+# Utilisation d'onglets
 tab1, tab2 = st.tabs(["🔮 Prédiction de Rendement", "💡 Recommandation de Culture"])
 
 # --- ONGLET 1 : PRÉDICTION ---
 with tab1:
     st.header("Estimer le rendement d'une culture précise")
-    with st.form("form_prediction"):
-        col1, col2 = st.columns(2)
-        with col1:
-            item = st.selectbox("Culture", ['Maize', 'Potatoes', 'Rice', 'Wheat', 'Sorghum', 'Soybean',
-                                            'Cassava', 'Yams', 'Sweet potatoes', 'Plantains and others'], key="item_p")
-            region = st.selectbox("Région", ['Southern Asia', 'Southern Europe', 'Northern Africa', 'Polynesia',
-                                                 'Sub-Saharan Africa', 'Latin America and the Caribbean',
-                                                 'Western Asia', 'Australia and New Zealand', 'Western Europe',
-                                                 'Eastern Europe', 'Northern America', 'South-eastern Asia','Eastern Asia',
-                                                 'Northern Europe', 'Melanesia', 'Micronesia','Central Asia'], key="reg_p")
-        
-        with col2:
-            avg_temp = st.slider("Température Moyenne (°C)", -5.0, 45.0, 15.0, key="temp_p")
-            rainfall = st.slider("Précipitations (mm)", min_value=0, value=3500, key="rain_p")
-            pesticides = st.slider("Pesticides (tonnes)", min_value=0.0, value=1850000.0, key="pest_p")
-        
-        submit_p = st.form_submit_button("Lancer la prédiction")
+
+    # 2 colonnes : gauche formulaire / droite encart
+    left_col, right_col = st.columns([3, 1])
+
+    with left_col:
+        with st.form("form_prediction"):
+            col1, col2 = st.columns(2)
+
+            with col1:
+                item = st.selectbox(
+                    "Culture",
+                    ['Maize', 'Potatoes', 'Rice', 'Wheat', 'Sorghum', 'Soybean',
+                     'Cassava', 'Yams', 'Sweet potatoes', 'Plantains and others'],
+                    key="item_p"
+                )
+                region = st.selectbox(
+                    "Région",
+                    ['Southern Asia', 'Southern Europe', 'Northern Africa', 'Polynesia',
+                     'Sub-Saharan Africa', 'Latin America and the Caribbean',
+                     'Western Asia', 'Australia and New Zealand', 'Western Europe',
+                     'Eastern Europe', 'Northern America', 'South-eastern Asia', 'Eastern Asia',
+                     'Northern Europe', 'Melanesia', 'Micronesia', 'Central Asia'],
+                    key="reg_p"
+                )
+
+            with col2:
+                avg_temp = st.slider("Température Moyenne (°C)", -5.0, 45.0, 15.0, key="temp_p")
+                rainfall = st.slider("Précipitations (mm)", min_value=0, value=3500, key="rain_p")
+                pesticides = st.slider("Pesticides (tonnes)", min_value=0.0, value=1850000.0, key="pest_p")
+
+            submit_p = st.form_submit_button("Lancer la prédiction")
+
+    with right_col:
+        st.markdown("### Taux d'erreur en %")
+        st.info(infos_mape.get(st.session_state.get("item_p", "Maize"), "Aucune info disponible."))
+        st.markdown("### Perte économique en dollars (par tonne par hectar)")
+        st.info(infos_economic.get(st.session_state.get("item_p", "Maize"), "Aucune info disponible."))
 
     if submit_p:
         payload = {
-            "region": region, "item": item,
-            "avg_temp": avg_temp, "rainfall_mm": rainfall, "pesticides_tonnes": pesticides
+            "region": region,
+            "item": item,
+            "avg_temp": avg_temp,
+            "rainfall_mm": rainfall,
+            "pesticides_tonnes": pesticides
         }
         try:
             with st.spinner("Calcul en cours..."):

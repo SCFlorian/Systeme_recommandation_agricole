@@ -135,7 +135,10 @@ HF_TOKEN=votre_token_hf
 6. Génération d'un modèle depuis le notebook de modélisation
     1. Enregistrement du modèle retenu avec joblib
     2. Déposez le modèle dans votre compte HF dans models
-    3. Changez dans config le nom de votre repo HF pour effectuer les bons liens
+    3. Deux options pour la récupération du modèle :
+        - Vous gardez le chemin de notre HF pour prendre notre meilleur modèle (chemin dans l'app)
+        - Vous effectuez vos propres expérimentations dans le notebook modélisation et vous le mettez dans votre propre HF Models.
+        - Vous pouvez également déployer sur votre propre HF Spaces si vous modifez le nom du Spaces pour le mettre dans votre propre compte. 
 7. Génération de l'interface
     - Push sur main et le déploiement s'effectue
 
@@ -194,7 +197,7 @@ Notre distribution ressemble à une cloche, donc à une distribution normale mê
 <img width="640" height="480" alt="Image" src="https://github.com/user-attachments/assets/b9390456-6099-4587-88f3-6fd2dcbf7d60" />
 
 - On retrouve quelques valeurs aberrantes sur notre variable cible. On peut voir des rendements négatifs donc nous avons décidé de les supprimer car cela concerne uniquement 231 lignes sur les 1 million.
-- Les valeurs "extrêmes" supérieurs sont moins présents et ne présentent pas d'anomalies statistiques.
+- Les valeurs "extrêmes" supérieures ne constituent pas d'anomalies statistiques mais une réalité du dataset.
 - Afin de préparer le fichier pour l'ACP, on décide de mettre les variables **Fertilizer_Used** et **Irrigation_Used** en numérique (0 ou 1 car les valeurs étaient True or False).
 
 #### Analyse des composantes principales
@@ -226,7 +229,7 @@ Nos variables sont indépendantes, ce qui nous ne permet pas de réaliser une bo
     - Fertilizer_Used
     - Temperature_Celsius
     - Irrigation_Used
-- Variable opposée : Days_to_Harvest est négativement correlé avec celles du dessus
+- Variable opposée : Days_to_Harvest est négativement correlée avec celles du dessus
     - plus d’engrais / température / irrigation = moins de jours jusqu’à récolte
 - Variable isolée :
     - Rainfall : Rainfall est faiblement corrélée aux autres variables
@@ -279,7 +282,7 @@ On retrouve dans ce fichier les précipitations en mm par pays et par année.
 
 Après analyse du fichier :
 - Pas de doublons
-- + de 11% de valeurs manquantes dans la variable des précipitations.
+- Plus de 11% de valeurs manquantes dans la variable des précipitations.
 - Identification de 25 pays sans valeur, sans aucune valeur par année.
 ```
 Liste des pays avec des valeurs nulles : 
@@ -318,8 +321,8 @@ Après analyse du fichier :
 
 ### Fichier yield.csv
 
-On retouve dans ce fichier un dataset central par pays, par année, par type de culture ainsi que les valeurs de rendements.
-Ce fichier est central et sera donc le fichier à consolidé avec les fichiers des conditions climatiques.
+On retouve dans ce fichier un dataset central par pays, par année, par type de culture ainsi que les valeurs de rendement.
+Ce fichier est central et sera donc le fichier à consolider avec les fichiers des conditions climatiques.
 
 **Distribution de la variable de rendement :**
 
@@ -331,7 +334,7 @@ On voit un étalement vers la gauche. Les données se suivent pas une distributi
 
 <img width="1400" height="700" alt="Image" src="https://github.com/user-attachments/assets/e651fc71-b238-4fac-959c-d243b3d31f22" />
 
-- On peut voir quelques valeurs à 0. Difficile de savoir si on les supprime ou non car théoriquement un rendement à 0 c'est possible si les conditions ne sont pas réunies pour une production. Mais certaines valeurs ressemblantes ont des données de rendement. Nous avons seulement 8 valeurs à 0 alors on peut les supprimer.
+- On peut voir quelques valeurs à 0. Difficile de savoir si on les supprime ou non car théoriquement un rendement à 0 est possible si les conditions ne sont pas réunies pour une production. Mais certaines valeurs ressemblantes ont des données de rendement. Nous avons seulement 8 valeurs à 0 alors on peut les supprimer.
 - On voit une valeur énorme pour Plaintains and more
     - La valeur extrême date de 1964, nous irons pas dans des dates aussi antérieures donc elle sera enlevée par défaut par la suite.
 - On voit un fort déséquilibre entre les types de culture. On peut noter que la catégorie Potatoes semble avoir avoir des rendements plus élevés que les autres. Ce sont des valeurs extrêmes mais pas aberrantes car elles sont réelles alors nous devons les laisser. 
@@ -358,7 +361,7 @@ Avant de pouvoir étudier correctement les relations entre les différentes cond
 Le fichier central est yield, nous allons donc faire des jointures sur ce fichier.
 Il y a plusieurs problématiques :
 - Pas exactement les mêmes noms pour tous les pays
-- Un nombre d'années différent entre les fichiers
+- Un nombre d'année différent entre les fichiers
 - Impact potentiel, un nombre de NaN conséquent pour certains pays et certaines années.
 
 Choix méthodologiques :
@@ -391,7 +394,7 @@ Exemples de modifications :
   ```
 
 2. Harmonisation du nom des variables et restriction de la temporalité
-- Ajout de nom de varibale cohérent
+- Ajout de nom de variable cohérent
 - Temporalité commune : 1990 -> 2016
     - Avoir en tête que le fichier temp s'arrêtait en 2013
 
@@ -467,7 +470,7 @@ Cet exemple est pertinent :
 ### Comparaison ACP vs dataset prediction
 
 L’ACP montre que la variance est répartie de manière homogène entre les composantes, ce qui indique l’absence de structure dominante et de fortes corrélations entre les variables explicatives.
-La matrice de corrélation confirme ce constat, avec des coefficients globalement faibles, traduisant des relations linéaires limitées entre variables, ainsi qu’avec la variable cible.
+La matrice de corrélation confirme ce constat, avec des coefficients globalement faibles, traduisant des relations linéaires limitées entre variable, ainsi qu’avec la variable cible.
 
 ## Enrichissement du fichier consolidé
 
@@ -484,12 +487,12 @@ Il n'y a de relation directe entre notre premier dataset (celui pour l'ACP) et l
 
 Le fichier crop_yield semble être un fichier synthétique :
 - Pas de corrélation entre les variables explicatives
-- Répartition à quasi 50/50 des valeurs pour chaque variables 
+- Répartition à quasi 50/50 des valeurs pour chaque variable
 
 Plusieurs méthodes d'enrichissement ont été effectué :
 - Modèle de régression logistique afin de prédire les différentes variables sur le nouveau fichier
     - Variables explicative : précipitation et température
-    - Après un test, le modèle n'arrive pas à généraliser, les variables explicatives sont indépendantes entre elles Les données sont "plates" (sans corrélations fortes), le modèle de ML essayait de trouver une règle là où il n'y en a pas
+    - Après un test, le modèle n'arrive pas à généraliser, les variables explicatives sont indépendantes entre elles. Les données sont "plates" (sans corrélations fortes), le modèle de ML essayait de trouver une règle là où il n'y en a pas
     - Par exemple, la balanced_accuracy était à 0,50 pour le fertilisant et l'irrigation
 ```
 ============================================================
@@ -627,7 +630,7 @@ Nous avons désormais consolidé notre dataset :
 - Une première fois avec 3 variables climatiques puis imputer de manière rigoureuse pour les données manquantes.
 - Une deuxième fois en enrichissant le dataset avec des variables approximatives qui devraient aider notre modèle à mieux généraliser
 
-Nous devons maintenant continuer l'amélioration de nos données en ajoutant des données si possibles,et en transformant nos données pour être compréhensible pour un modèle.
+Nous devons maintenant continuer l'amélioration de nos données en ajoutant des données si possible,et en transformant nos données pour être compréhensible pour un modèle.
 
 **Nouvelles variables**
 
@@ -652,13 +655,15 @@ yield_df_enriched['years_from_now'] = year_ref - yield_df_enriched['year']
 ```
 - Pas relation forte entre nos variables mais on voit que l'ajout des nouvelles variables ne sont pas redondantes avec les features d'origine.
 
-## Feature engineering sur le fichier consolidé
+## Feature engineering sur le fichier "brut"
 
-Afin de s'assurer de la pertinence de l'enrichissement de nos données, on va devoir comparer la modélisation entre le fichier enrichi et le fichier consolidé sans enrichissement.
+**Petit rappel de la problématique sur les fichiers de ce projet. L'entreprise nous a donné 2 datasets dont un qui présente selon nous des données synthétiques (le fichier crop_yield).**
 
-Pour réaliser cela, nous devons effectuer le même feature engineering.
+**Nous avons essayé de les rapprocher de la manière la plus propre possible statistiquement mais n'ayant pas la possibilité de les joindre de manière "directe" nous avons utilisé la méthode de sampling conditionnel pour rajouter les éléments qui manquaient dans notre fichier de base.**
 
-Nous devons maintenant continuer l'amélioration de nos données en ajoutant des données si possibles.
+**C'est pour cela que nous avons décidé de tester également le fichier brut sans les éléments rajoutés (nommés ici enrichissement) afin d'utiliser le meilleur dataset possible pour notre projet. Nous les comparerons avec des métriques ML pour choisir.**
+
+Pour réaliser cela, nous devons effectuer le même feature engineering sur le fichier brut.
 
 **Nouvelles variables**
 
@@ -685,17 +690,14 @@ Sans avoir enrichi notre fichier, on ne peut pas ajouter la variable irrigation_
 
 <img width="2277" height="1772" alt="Image" src="https://github.com/user-attachments/assets/dff6af55-5ed6-4d2f-9c80-a65fd5ed0faf" />
 
-Nous n'avons pas ici des variables trop corrélées ensemble, nous n'avons pas à enlever d'autres variables.
+Nous n'avons pas ici des variables trop corrélées ensemble, nous n'avons pas à enlever d'autres feature.
 
-- Sur ces premiers tests on ne voit pas des meilleurs résultats pour le fichier enrichi, les informations rajoutées ne semblent pas apporter quelque chose d'utile pour nos modèles.
-- On voit que le modèle de RandomForest a des meilleurs résulats (sans optimisation des meilleurs paramètres) mais suivi de très près par XGBoost et LightGBM.
-- N'ayant pas une distribution linéaire, on voit que la regression linéraire ne généralise pas.
 
 ## Modélisation
 
-Dans la phase d'analyse exploratoire et de prétraitement, nous avons fait le choix de tester dans un premier temps les 2 fichiers consolidés que nous avons réalisé :
-- dataset consolidé sans enrichissement
-- dataset consolidé avec enrichissement (à l'aide du fichier crop_yield)
+Nous allons passer à l'évaluation de nos 2 fichiers afin de choisir le plus pertinent pour notre modèle. Afin d'être le plus clair possible, nous nommerons les fichiers ainsi :
+- **dataset brut - c'est le fichier consolidé après nettoyage & fusion des conditions climatiques**
+- **dataset enrichi - c'est le fichier consolidé après nettoyage & fusion des conditions climatiques avec en + les features rajoutées lors de l'enrichissement des données**
 
 Pour le suivi de la modélisation avec des pratiques de MLOps, nous utilisons **MLFlow** pour suivre les expérimentations. L'ensemble des tests ont été réalisé dans le notebook dédié à la modélisation. À l'intérieur on va retouver plusieurs blocs :
 - un suivi MLFlow de 5 modèles sur le fichier consolidé
@@ -718,7 +720,7 @@ On a testé 5 modèles différents :
 **Pourquoi ces modèles ?**
 
 - D’abord, une baseline minimale avec DummyRegressor. Le but était d’avoir un point de comparaison naïf. Ça permet de vérifier que le pipeline apprend réellement quelque chose et qu’on ne se satisfait pas d’un score “bon en apparence”.
-- Ensuite, une baseline linéaire avec LinearRegression. Utilisation pour tester l’hypothèse la plus simple : si le rendement s’explique surtout par des relations linéaires entre climat, intrants et culture.
+- Ensuite, une baseline linéaire avec LinearRegression. Utilisation pour tester l’hypothèse la plus simple, si le rendement s’explique surtout par des relations linéaires entre climat, intrants et culture.
 - Ensuite on a testé 3 trois familles d'arbres car le problème mélange :
     - des variables numériques comme avg_temp, rainfall_mm, pesticides_tonnes, thermal_stress etc
     - des variables catégorielles comme region, item, is_drought
@@ -752,12 +754,14 @@ On a testé 5 modèles différents :
 
 ### Résultats des performances sur le fichier consolidé
 
+**Résumé de la première étape de modélisation**
+
 Les expérimentations montrent que les modèles d’arbres surpassent nettement les baselines simples.  
-Le **RandomForestRegressor** obtient les meilleures performances globales sur le dataset consolidé, avec un **R² test de 0,9436**, un **RMSE de 1712,47 kg/ha** et un **MAE de 804.54 kg/ha**.  
+Le **RandomForestRegressor** obtient les meilleures performances globales sur le dataset brut, avec un **R² test de 0,9436**.  
 
-L’enrichissement du dataset à partir du fichier `crop_yield` n’a pas permis d’améliorer les performances de manière significative. Le choix final s’est donc porté sur le **dataset consolidé sans enrichissement**, plus simple, plus lisible et tout aussi performant.
+Le dataset enrichi n’a pas permis d’améliorer les performances de manière significative. Le choix final s’est donc porté sur le **dataset brut**, plus simple, plus lisible et tout aussi performant.
 
-#### **Dans le détail** 
+#### **Dans le détail, voici ce que nous avons fait** 
 
 **Sur les 2 modèles "simples"**
 - Sur le DummyRegressor et le LinearRegression les résultats ne sont pas bons, c'était attendu. Le Dummy nous sert comme base pour comparer et nous ne sommes pas face à une distribution linéaire alors LinearRegression ne généralise pas bien. Les modèles linéaires montrent leurs limites sur ce problème, ce qui confirme la présence de relations non linéaires entre les variables explicatives et le rendement.
@@ -766,32 +770,33 @@ L’enrichissement du dataset à partir du fichier `crop_yield` n’a pas permis
 ```
 === Résultats métriques ===
 CV RMSE : 7604.3730 (± 187.80)
-CV MAE  : 5578.7140 (± 93.2737)
+CV MAPE  : 2.6730 (± 0.1885)
 CV R2   : -0.0002 (± 0.0002)
 Test RMSE : 7216.6343
 Test R2   : -0.0013
-Test MAE  : 5378.3028
+Test MAPE  : 2.4448
 Test economic_error_usd_ha : 1680.7060
 ```
 - LinearRegression :
 ```
 === Résultats métriques ===
 CV RMSE : 4840.4290 (± 55.16)
-CV MAE  : 3233.5153 (± 58.2632)
+CV MAPE  : 0.9546 (± 0.0388)
 CV R2   : 0.5943 (± 0.0143)
 Test RMSE : 4805.9227
 Test R2   : 0.5559
-Test MAE  : 3201.1100
+Test MAPE  : 0.9859
 Test economic_error_usd_ha : 1033.3629
 ```
 **Comparaison sur tous les modèles**
 - Résultats des tests du R2
 
-<img width="1200" height="600" alt="Image" src="https://github.com/user-attachments/assets/f0f6cc35-c0c5-4e31-a8e9-178fb543aff4" />
+<img width="1310" height="832" alt="Image" src="https://github.com/user-attachments/assets/3033d68d-546d-49fe-9587-ca8ab035efe6" />
 
 - Résultats des tests du MAPE 
 
-<img width="1200" height="600" alt="Image" src="https://github.com/user-attachments/assets/2bf8ee15-1d92-4ea4-b43b-0fbf440f6f21" />
+<img width="1341" height="826" alt="Image" src="https://github.com/user-attachments/assets/519b4169-7d35-4503-bd7f-fedca414a06f" />
+
 
 Les modèles d’arbres obtiennent des performances nettement supérieures aux modèles de référence.
 
@@ -803,42 +808,53 @@ Par exemple le RandomForest a "seulement" 17% d'erreur en valeur absolue, en com
 ```
 === Résultats métriques ===
 CV RMSE : 1893.0226 (± 45.34)
-CV MAE  : 894.9234 (± 4.1971)
+CV MAPE  : 0.2091 (± 0.0098)
 CV R2   : 0.9378 (± 0.0051)
 Test RMSE : 1729.6763
 Test R2   : 0.9425
-Test MAE  : 796.4869
+Test MAPE  : 0.1739
 Test economic_error_usd_ha : 273.6834
 ```
 - Sur la validation croisée on voit que l'écart-type entre les différents folds est petit, les résultats restent stables.
-- Le MAE peut est à 796 par kg/ha sur le test. Cela peut sembler haut mais il faut prendre en compte le contexte métier ici où on sait que les rendements dépendent de beaucoup de facteurs et que les prédictions sont à ajuster avec sa connsaissance terrain.
+- 17% d'erreur (MAPE) sur le test. Cela peut sembler haut mais il faut prendre en compte le contexte métier ici où on sait que les rendements dépendent de beaucoup de facteurs et que les prédictions sont à ajuster avec sa connsaissance terrain.
 
 
 **XGBRegressor**
 ```
 === Résultats métriques ===
 CV RMSE : 2152.0037 (± 71.11)
-CV MAE  : 1292.0533 (± 24.5055)
+CV MAPE  : 0.3938 (± 0.0186)
 CV R2   : 0.9195 (± 0.0082)
 Test RMSE : 2040.8158
 Test R2   : 0.9199
-Test MAE  : 1226.2530
+Test MAPE  : 0.3603
 Test economic_error_usd_ha : 406.6547
 ```
 - Même si les résultats ne sont pas mauvais ils restent bien en-dessous sur toutes les métriques.
 
-**Analyse du MAE par type de culture et du economic_error_usd_ha sur notre meilleur modèle**
+**Analyse du MAPE par type de culture et du economic_error_usd_ha sur notre meilleur modèle**
 
-- Nous avons vu dans la partie exploratoire un déséquilibre assez fort entre certains type de culture et le rendement. Par exemple on a noté la présence de gros rendement sur la catégorie des pommes de terre. Ces gros écart tirent les erreurs du MAE vers le haut.
+- MAPE
 
-<img width="428" height="402" alt="Image" src="https://github.com/user-attachments/assets/d12e1acd-b4eb-49c1-9ab5-333013ff74ae" />
+<img width="349" height="400" alt="Image" src="https://github.com/user-attachments/assets/5bf7099f-2349-442f-9500-78a8a30ec41a" />
 
-On remarque que les erreurs sont variables entre type de culture, on note par exemple qu'en kg/ha c'est la catégorie avec les plus gros rendements qui a le plus d'erreur.
+Le RandomForest affiche une excellente précision globale, mais l'analyse granulaire par culture via MLflow révèle des disparités intéressantes. Par exemple, le Riz atteint une erreur de seulement 13%, tandis que l'Igname monte à 29%. Cette différence s'explique par la plus grande variabilité biologique de certaines racines et potentiellement par un volume de données plus restreint sur ces catégories.
 
 
 - Au-delà des métriques de modélisation classiques, une métrique métier a été introduite : `economic_error_usd_ha`.
 
-<img width="1200" height="600" alt="Image" src="https://github.com/user-attachments/assets/566411aa-95aa-4b04-9cf5-13a91fc68ac8" />
+**Calcul de cette métrique** :
+
+- Calcul de l'erreur physique :
+    - On calcule d'abord l'écart absolu entre la réalité et la prédiction en hectogrammes.
+- Conversion en tonnes :
+    - Comme les prix du marché mondial sont fixés à la tonne, on convertit l'erreur
+- Valorisation monétaire :
+    - On multiplie cette erreur par le prix spécifique de la culture fourni par la FAO (en USD/tonne)
+
+<img width="1319" height="833" alt="Image" src="https://github.com/user-attachments/assets/65a37c5e-c33c-4e12-943b-cd97e86b97b0" />
+
+Passer d'une estimation 'au doigt mouillé' (Dummy) à mon modèle permet de sécuriser en moyenne plus de 1000 USD par hectare en précision de trésorerie.
 
 - Pour le meilleur modèle, cette erreur est estimée à **273,7 USD/ha**. Le coût n'est pas négligeable selon la taille des champs mais cela reste une estimation et elle est la plus optimisée pour le moment. 
 - C’est très utile pour un exploitant agricole, parce qu’on traduit l’erreur de prédiction en impact financier moyen par hectare. Donc on peut répondre non seulement à “le modèle est-il précis ?”, mais surtout à :
@@ -847,12 +863,11 @@ On remarque que les erreurs sont variables entre type de culture, on note par ex
 
 - Le Random Forest présente le meilleur compromis entre précision, stabilité et interprétabilité.
 
-### Comparaison des performances des modèles sur le fichier consolidé et le fichier enrichi
+### Comparaison des performances des modèles sur le dataset brut et le datatset enrichi
 
 
-<img width="707" height="765" alt="Image" src="https://github.com/user-attachments/assets/1a36ec71-d4b9-471c-a34f-f77f3a9061d1" />
+<img width="888" height="756" alt="Image" src="https://github.com/user-attachments/assets/a977f529-68fe-459c-8c83-9cc8f20d8a60" />
 
-Un second dataset a été construit en enrichissant le fichier consolidé avec des variables proxy issues du fichier `crop_yield`.  
 L’objectif était d’évaluer si cet enrichissement permettait d’améliorer la capacité de généralisation des modèles.
 
 Les résultats obtenus montrent toutefois que cet enrichissement n’apporte pas de gain mesurable sur les performances, et peut même légèrement dégrader certaines métriques.  
@@ -861,7 +876,7 @@ Ce résultat suggère que :
 - soit les variables ajoutées ne contiennent pas d’information suffisamment discriminante,
 - soit leur caractère indirect / approximatif limite leur contribution au modèle.
 
-Le choix final s’est donc porté sur le **dataset consolidé sans enrichissement**, afin de privilégier un pipeline plus simple et plus robuste.
+Le choix final s’est donc porté sur le **dataset brut**, afin de privilégier un pipeline plus simple et plus robuste.
 
 ### Optimisation des hyperparamètres
 
@@ -877,10 +892,33 @@ Une phase d’optimisation par `GridSearchCV` a été menée sur ce dernier.
 
 Les meilleurs hyperparamètres retenus sont les suivants (en comparaison avec la baseline):
 
-<img width="683" height="213" alt="Image" src="https://github.com/user-attachments/assets/41e9e461-1af9-40e7-995a-243cf86e069a" />
+<img width="719" height="216" alt="Image" src="https://github.com/user-attachments/assets/8a0690dd-aa8a-4216-855a-d9c1aad1a4f8" />
 
 Les gains observés après optimisation restent toutefois limités.  
 Ce comportement suggère que le modèle se situe déjà proche de son optimum sur les données disponibles. En conséquence, les marges de progression futures semblent davantage liées à l’enrichissement des données qu’à une optimisation algorithmique supplémentaire.
+
+**Analyse du R2 et de la métrique économique pour ce modèle par type de culture :**
+
+- R2 :
+
+<img width="478" height="368" alt="Image" src="https://github.com/user-attachments/assets/faa95966-7fcd-43b3-b795-ca43a3208c01" />
+
+-  Résultats :
+    - Le modèle RandomForest s'impose comme une solution robuste avec un R2 global de 0.94, capturant une bonne partie des données.
+    - Cependant, l'analyse par culture révèle une logique métier profonde, les cultures à haut rendement industriel, comme la pomme de terre ou le blé, affichent des scores d'excellence (R2>0.92 et MAPE basse), car elles répondent de manière prévisible aux intrants et au climat.
+    - À l'inverse, des cultures comme l'igname présentent une complexité supérieure (R2 de 0.66 et MAPE de 0.29), soulignant une sensibilité à des facteurs non capturés. 
+
+- Métrique économique :
+
+<img width="480" height="361" alt="Image" src="https://github.com/user-attachments/assets/76b9fd01-e8fe-4db8-b5e5-f5510d4716a2" />
+
+
+- Cultures à fort volume (ex: Potatoes) : Même si l'erreur en kg est élevée, le prix à la tonne est modéré (330 USD). L'impact financier est stable.
+- Cultures à forte valeur (ex: Yams / Igname) : À 890 USD/tonne, la moindre petite erreur de prédiction coûte très cher.
+- L'introduction de l'Economic Error permet de traduire ces écarts en enjeux financiers réels.
+- Prenons l'exemple de l'igname :
+- Il est un point de vigilance économique. C'est la culture où l'erreur coûte le plus cher. Comme le prix à la tonne est très élevé, chaque tonne mal prédite par le modèle représente une perte de visibilité financière énorme (890 USD/t). C'est pour cela que même si le modèle est globalement bon, c'est sur ce genre de valeur que nous devons concentrer nos efforts pour minimiser cette 'Economic Error' et sécuriser le revenu des producteurs.
+
 
 ## Interprétabilité du modèle feature importance et SHAP values
 
@@ -901,7 +939,7 @@ L’intérêt de croiser les deux approches est de distinguer :
 
 - Top 15 des variables les plus importantes :
 
-<img width="989" height="590" alt="Image" src="https://github.com/user-attachments/assets/d002baf4-cef7-42e4-85ff-91ca443fbed0" />
+<img width="989" height="590" alt="Image" src="https://github.com/user-attachments/assets/df37d172-29c8-4773-9b59-95fc6276fc54" />
 
 La variable la plus importante est de très loin item_Potatoes, avec un poids supérieur à 31 %. Cela signifie que le fait d’être sur la culture Potatoes structure fortement les décisions du modèle. Ce résultat est cohérent avec l’analyse exploratoire, qui montrait déjà que certaines cultures, notamment les pommes de terre, présentaient des niveaux de rendement beaucoup plus élevés que les autres.
 
@@ -909,22 +947,20 @@ On observe ensuite un second bloc de variables très influentes :
 - pesticides_tonnes
 - rainfall_mm
 - input_imbalance
-- avg_temp
-- thermal_stress
-- years_from_now
 
-Ce groupe montre que le modèle ne repose pas uniquement sur le type de culture : il intègre aussi fortement les conditions agro-climatiques, les intrants et une dimension temporelle.
+Ce groupe montre que le modèle ne repose pas uniquement sur le type de culture : il intègre aussi fortement les conditions agro-climatiques, les intrants.
+
 Enfin, plusieurs variables de région apparaissent dans le top 15, ce qui confirme que le contexte géographique joue un rôle significatif dans l’estimation des rendements.
 
 2. Importance par familles de variables
 
 Pour rendre l’analyse plus lisible métier, les variables ont été regroupées en grandes familles.
 
-<img width="790" height="390" alt="Image" src="https://github.com/user-attachments/assets/89b56b1b-4611-4934-a877-9fa4cf6600d7" />
+<img width="1990" height="590" alt="Image" src="https://github.com/user-attachments/assets/21a44866-c034-463d-a03b-78c9414c1ede" />
 
 - Le modèle s’appuie d’abord sur le type de culture, qui représente près de 49,4 % de l’importance totale. C’est le signal principal.
-- Les variables climatiques et techniques représentent ensuite environ 34% de l’importance totale. Cela montre que la prédiction ne dépend pas uniquement du choix de culture, mais aussi des conditions de production : pluie, température, pression d’intrants et déséquilibres entre eau et pesticides.
 - La région pèse environ 16,6 %, ce qui confirme qu’un même type de culture ne se comporte pas de la même manière selon le contexte géographique.
+- Les variables climatiques et techniques représentent également une grande importance. Cela montre que la prédiction ne dépend pas uniquement du choix de culture, mais aussi des conditions de production : pluie, température, pression d’intrants et déséquilibres entre eau et pesticides.
 - Cette répartition est cohérente d’un point de vue métier :
     - la culture fixe un potentiel de rendement de base
     - le climat et les intrants modulent ce potentiel
@@ -937,7 +973,7 @@ L’analyse SHAP affine cette lecture en montrant non seulement quelles variable
 **Variables les plus influentes selon SHAP**
 Les variables ressortant le plus fortement en contribution moyenne absolue sont :
 
-<img width="784" height="940" alt="Image" src="https://github.com/user-attachments/assets/6fb6d2f9-146a-4e62-9ff0-d56fb0c5f23a" />
+<img width="802" height="940" alt="Image" src="https://github.com/user-attachments/assets/e412900e-3749-4c24-b816-df77a2793923" />
 
 - Les SHAP values confirment que certaines cultures déplacent fortement la prédiction :
     - item_Potatoes a l’effet positif le plus fort du modèle
@@ -950,12 +986,38 @@ Les variables ressortant le plus fortement en contribution moyenne absolue sont 
     - region_Western Europe, region_Western Asia, region_Northern Europe et region_Eastern Asia ont plutôt des contributions positives.
 
 - Effet du climat et de l'intrant. Plusieurs variables numériques ont un rôle important :
-    - pesticides_tonnes : les valeurs élevées tendent globalement à pousser la prédiction vers le haut
-    - rainfall_mm : son effet est important mais dépend du contexte
+    - pesticides_tonnes : résultat plus contrasté avec les contribuions positives et négatives plus concentrées
+    - rainfall_mm : son effet est important mais dépend du contexte également
     - avg_temp : la température moyenne influence bien la prédiction, mais avec une intensité plus modérée que la pluie ou les pesticides
     - thermal_stress : un stress thermique élevé a plutôt un effet négatif
     - years_from_now : les valeurs élevées de cette variable, correspondant aux années les plus anciennes, ont tendance à tirer la prédiction vers le bas, tandis que les années plus récentes contribuent davantage positivement.
         Le modèle capte une tendance dans le temps avec l’idée d’une amélioration progressive des rendements au fil du temps, possiblement liée à l’évolution des pratiques, des intrants, des techniques ou des variétés.
+
+**Regardons la contribution des SHAP Values par grande catégorie**
+- Sur nos variables numériques :
+
+<img width="765" height="380" alt="Image" src="https://github.com/user-attachments/assets/e2b5afb8-1a51-4894-b68c-75022ada8d12" />
+
+- Résultats :
+    - Ce graphique montre par exemple que plus la valeur des pesticides ou des précipitations augmente (points roses), plus la prédiction de rendement est poussée vers le haut. Il permet de valider que le modèle réagit de manière logique aux variations environnementales et techniques.
+    - Mais on voit une forte concentration pour ces variables vers le milieu, le contexte joue beaucoup sur la contribution de ces variables
+
+- Sur les régions et les types de culture
+
+**Région** 
+
+<img width="801" height="820" alt="Image" src="https://github.com/user-attachments/assets/a7e5a95d-2ca1-4412-9f08-85a7a11a0d8f" />
+
+**Type de culture**
+
+<img width="778" height="540" alt="Image" src="https://github.com/user-attachments/assets/32ffade9-d66c-4423-9e9d-36791200d563" />
+
+- Résultats :
+    - En isolant les régions ou les cultures, les graphiques prouvent que le modèle a appris des spécificités géographiques (comme l'avantage structurel de certaines régions).
+    - On voit sur le type de culture que certaines valeurs poussent largement le modèle vers le haut et d'autres clairement vers le bas.
+        - Vers le haut : pomme de terre / igname / cassava / banane / patate douce
+        - Vers le bas : soja / sorghum / blé
+    - Cela montre que le modèle sait s'adapter au contexte local plutôt que d'appliquer une règle générique à toute la planète.
 
 4. Analyse d'une prédiction avec waterfall plot
 
@@ -963,7 +1025,7 @@ Cela part d'une prédiction moyenne du modèle sur le dataset d'entraînement, e
 
 <img width="1008" height="600" alt="Image" src="https://github.com/user-attachments/assets/3ebbe111-a79a-4ec1-94f1-14e7e53d9086" />
 
-Dans ce cas précis on voit qu'une large partie de la contribution positive du model vient de la catégorie plantains and others et dans une moindre mesure la variable des pesticides. Les autres variables vont pousser la prédiction vers le bas.
+Dans ce cas précis on voit qu'une large partie de la contribution positive du model vient de la catégorie cassava et dans une moindre mesure la région sud-est asiatique.
 
 ## Pipeline CI CD
 
