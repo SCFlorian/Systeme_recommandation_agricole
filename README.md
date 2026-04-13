@@ -1089,6 +1089,36 @@ Pour que ce workflow fonctionne, vous devez configurer le secret suivant dans le
 
 - Optimisation : les dépendances sont installées sans interaction (--no-interaction) pour éviter que le runner ne reste bloqué sur une question.
 
+## Tests et validation des données
+
+La fiabilité du système repose sur deux piliers : la validation stricte des entrées avec Pydantic et une suite de tests automatisés intégrée au cycle CI/CD.
+
+1. Validation de données avec Pydantic
+
+- Pour garantir l'intégrité des prédictions, l'API utilise des schémas Pydantic (InputPrediction et InputRecommendation).
+- Validation d'entrée : Chaque requête est vérifiée en temps réel. Si un utilisateur envoie une chaîne de caractères au lieu d'un nombre pour la température, l'API rejette la requête proprement avec une erreur 422 Unprocessable Entity.
+- Documentation auto-générée : Grâce aux Field et json_schema_extra.
+
+2. Suite de tests (Pytest)
+
+Le projet inclut une batterie de tests unitaires et d'intégration pour assurer la stabilité du code :
+
+- Tests d'API (Integration Tests) :
+    - test_predict_endpoint & test_recommend_ok : vérifient que les prédictions et recommandations renvoient des résultats cohérents et un code HTTP 200.
+    - test_404_handler & test_predict_validation_error : assurent que l'API gère les erreurs
+
+- Tests de Nettoyage (Unit Tests) :
+
+    - test_preparation_inference_columns : Vérifie que le script de nettoyage transforme correctement les données brutes et génère bien les colonnes calculées. Pour que le pipeline de données est identique entre l'entraînement et l'inférence.
+    - Intégrité CI/CD : un test de base (test_ci_cd_pipeline) valide le bon fonctionnement du moteur de test dans le pipeline GitHub Actions.
+
+3. Couverture de Code (Pytest-Cov)
+
+- Le projet intègre pytest-cov dans le pipeline CI/CD. À chaque mise à jour :
+    - Les tests sont exécutés.
+    - Un rapport de couverture (term-missing) est généré, identifiant précisément les lignes de code non testées.
+    - Le déploiement vers Hugging Face est bloqué si les tests échouent, garantissant une version de production toujours fonctionnelle.
+
 ## Conclusion 
 
 Ce projet démontre qu’un pipeline MLOps structuré permet de transformer des données agricoles disparates en un outil d’aide à la décision performant. Le modèle Random Forest, avec un R2 global de 0.94, ne se contente pas de prédire des rendements, il capture les dynamiques complexes entre climat, géographie et techniques agricoles.
