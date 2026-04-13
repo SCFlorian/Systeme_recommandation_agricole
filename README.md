@@ -23,7 +23,9 @@ pinned: false
 9. [Modélisation](#modélisation)
 10. [Interprétabilité du modèle feature importance et SHAP values](#interprétabilité-du-modèle-feature-importance-et-shap-values)
 11. [Pipeline CI CD](#pipeline-ci-cd)
-12. [Perspectives](#perspectives)
+12. [Tests et validation des données](#tests-et-validation-des-données)
+13. [Conclusion](#conclusion)
+14. [Perspectives](#perspectives)
 
 ## Présentation
 
@@ -1107,12 +1109,12 @@ Le projet inclut une batterie de tests unitaires et d'intégration pour assurer 
     - test_predict_endpoint & test_recommend_ok : vérifient que les prédictions et recommandations renvoient des résultats cohérents et un code HTTP 200.
     - test_404_handler & test_predict_validation_error : assurent que l'API gère les erreurs
 
-- Tests de Nettoyage (Unit Tests) :
+- Tests de nettoyage (Unit Tests) :
 
     - test_preparation_inference_columns : Vérifie que le script de nettoyage transforme correctement les données brutes et génère bien les colonnes calculées. Pour que le pipeline de données est identique entre l'entraînement et l'inférence.
     - Intégrité CI/CD : un test de base (test_ci_cd_pipeline) valide le bon fonctionnement du moteur de test dans le pipeline GitHub Actions.
 
-3. Couverture de Code (Pytest-Cov)
+3. Couverture de code (Pytest-Cov)
 
 - Le projet intègre pytest-cov dans le pipeline CI/CD. À chaque mise à jour :
     - Les tests sont exécutés.
