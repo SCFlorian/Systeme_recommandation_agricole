@@ -699,9 +699,9 @@ Nous allons passer à l'évaluation de nos 2 fichiers afin de choisir le plus pe
 - **dataset brut - c'est le fichier consolidé après nettoyage & fusion des conditions climatiques**
 - **dataset enrichi - c'est le fichier consolidé après nettoyage & fusion des conditions climatiques avec en + les features rajoutées lors de l'enrichissement des données**
 
-Pour le suivi de la modélisation avec des pratiques de MLOps, nous utilisons **MLFlow** pour suivre les expérimentations. L'ensemble des tests ont été réalisé dans le notebook dédié à la modélisation. À l'intérieur on va retouver plusieurs blocs :
-- un suivi MLFlow de 5 modèles sur le fichier consolidé
-- un suivi MLFlow de 5 modèles sur le fichier consolidé avec enrichissement
+Pour le suivi de la modélisation avec des pratiques de MLOps, nous utilisons **MLFlow** pour suivre les expérimentations. L'ensemble des tests ont été réalisé dans le notebook dédié à la modélisation. À l'intérieur on va retrouver plusieurs blocs :
+- un suivi MLFlow de 5 modèles sur le dataset brut
+- un suivi MLFlow de 5 modèles sur le dataset enrichi
 - un suivi MLFlow pour l'optimisation des hyperparamètres du modèle retenu
 
 ### Schéma MLOPs
@@ -752,7 +752,7 @@ On a testé 5 modèles différents :
 - Erreur économique (economic_error_usd_ha) : c'est une métrique métier personnalisée, elle convertit l'erreur de prédiction en perte financière par hectare
     - Nous avons récupéré les prix par tonne au niveau mondial pour chaque type de culture pour l'année de 2016 (dernière année de notre dataset)
 
-### Résultats des performances sur le fichier consolidé
+### Résultats des performances sur le dataset brut
 
 **Résumé de la première étape de modélisation**
 
@@ -915,7 +915,7 @@ Ce comportement suggère que le modèle se situe déjà proche de son optimum su
 
 
 - Cultures à fort volume (ex: Potatoes) : Même si l'erreur en kg est élevée, le prix à la tonne est modéré (330 USD). L'impact financier est stable.
-- Cultures à forte valeur (ex: Yams / Igname) : À 890 USD/tonne, la moindre petite erreur de prédiction coûte très cher.
+- Cultures à forte valeur (ex: igname) : À 890 USD/tonne, la moindre petite erreur de prédiction coûte très cher.
 - L'introduction de l'Economic Error permet de traduire ces écarts en enjeux financiers réels.
 - Prenons l'exemple de l'igname :
 - Il est un point de vigilance économique. C'est la culture où l'erreur coûte le plus cher. Comme le prix à la tonne est très élevé, chaque tonne mal prédite par le modèle représente une perte de visibilité financière énorme (890 USD/t). C'est pour cela que même si le modèle est globalement bon, c'est sur ce genre de valeur que nous devons concentrer nos efforts pour minimiser cette 'Economic Error' et sécuriser le revenu des producteurs.
