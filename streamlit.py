@@ -78,7 +78,7 @@ with tab1:
     with right_col:
         st.markdown("### Taux d'erreur en %")
         st.info(infos_mape.get(st.session_state.get("item_p", "Maize"), "Aucune info disponible."))
-        st.markdown("### Perte économique en dollars (par tonne par hectar)")
+        st.markdown("### Perte économique en dollars (par hectare)")
         st.info(infos_economic.get(st.session_state.get("item_p", "Maize"), "Aucune info disponible."))
 
     if submit_p:
