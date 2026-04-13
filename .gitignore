@@ -30,6 +30,7 @@ graph/
 pdf-style.css
 rapport_metier.md
 rapport_metier.pdf
+.coverage
 
 # MLFlow
 mlruns/
