@@ -17,9 +17,9 @@ pinned: false
 3. [Prérequis](#prérequis)
 4. [Installation](#installation)
 5. [Analyse exploratoire des fichiers sources](#analyse-exploratoire-des-fichiers-sources)
-6. [Enrichissement du fichier consolidé](#enrichissement-du-fichier-consolidé)
-7. [Feature engineering sur le fichier enrichi](#feature-engineering-sur-le-fichier-enrichi)
-8. [Feature engineering sur le fichier consolidé](#feature-engineering-sur-le-fichier-consolidé)
+6. [Enrichissement du dataset](#enrichissement-du-dataset)
+7. [Feature engineering sur le dataset enrichi](#feature-engineering-sur-le-dataset-enrichi)
+8. [Feature engineering sur le dataset brut](#feature-engineering-sur-le-dataset-brut)
 9. [Modélisation](#modélisation)
 10. [Interprétabilité du modèle feature importance et SHAP values](#interprétabilité-du-modèle-feature-importance-et-shap-values)
 11. [Pipeline CI CD](#pipeline-ci-cd)
@@ -472,7 +472,7 @@ Cet exemple est pertinent :
 L’ACP montre que la variance est répartie de manière homogène entre les composantes, ce qui indique l’absence de structure dominante et de fortes corrélations entre les variables explicatives.
 La matrice de corrélation confirme ce constat, avec des coefficients globalement faibles, traduisant des relations linéaires limitées entre variable, ainsi qu’avec la variable cible.
 
-## Enrichissement du fichier consolidé
+## Enrichissement du dataset
 
 Il n'y a de relation directe entre notre premier dataset (celui pour l'ACP) et les autres datasets.
 - Le premier fichier est par grande région et culture
@@ -624,7 +624,7 @@ Sorghum              False                 NaN  0.519462
                      True                  NaN  0.480538
 ```
 
-## Feature engineering sur le fichier enrichi
+## Feature engineering sur le dataset enrichi
 
 Nous avons désormais consolidé notre dataset :
 - Une première fois avec 3 variables climatiques puis imputer de manière rigoureuse pour les données manquantes.
@@ -655,7 +655,7 @@ yield_df_enriched['years_from_now'] = year_ref - yield_df_enriched['year']
 ```
 - Pas relation forte entre nos variables mais on voit que l'ajout des nouvelles variables ne sont pas redondantes avec les features d'origine.
 
-## Feature engineering sur le fichier "brut"
+## Feature engineering sur le dataset brut
 
 **Petit rappel de la problématique sur les fichiers de ce projet. L'entreprise nous a donné 2 datasets dont un qui présente selon nous des données synthétiques (le fichier crop_yield).**
 
@@ -804,6 +804,7 @@ Par exemple le RandomForest a "seulement" 17% d'erreur en valeur absolue, en com
 
 
 **Petit focus sur ces 2 modèles**
+
 **RandomForestRegressor**
 ```
 === Résultats métriques ===
@@ -838,7 +839,7 @@ Test economic_error_usd_ha : 406.6547
 
 <img width="349" height="400" alt="Image" src="https://github.com/user-attachments/assets/5bf7099f-2349-442f-9500-78a8a30ec41a" />
 
-Le RandomForest affiche une excellente précision globale, mais l'analyse granulaire par culture via MLflow révèle des disparités intéressantes. Par exemple, le Riz atteint une erreur de seulement 13%, tandis que l'Igname monte à 29%. Cette différence s'explique par la plus grande variabilité biologique de certaines racines et potentiellement par un volume de données plus restreint sur ces catégories.
+Le RandomForest affiche une excellente précision globale, mais l'analyse granulaire par culture via MLflow révèle des disparités intéressantes. Par exemple, le riz atteint une erreur de seulement 13%, tandis que l'igname monte à 29%. Cette différence s'explique par la plus grande variabilité biologique de certaines racines et potentiellement par un volume de données plus restreint sur ces catégories.
 
 
 - Au-delà des métriques de modélisation classiques, une métrique métier a été introduite : `economic_error_usd_ha`.
@@ -854,7 +855,7 @@ Le RandomForest affiche une excellente précision globale, mais l'analyse granul
 
 <img width="1319" height="833" alt="Image" src="https://github.com/user-attachments/assets/65a37c5e-c33c-4e12-943b-cd97e86b97b0" />
 
-Passer d'une estimation 'au doigt mouillé' (Dummy) à mon modèle permet de sécuriser en moyenne plus de 1000 USD par hectare en précision de trésorerie.
+Passer d'une estimation 'au doigt mouillé' (Dummy) au meilleur modèle permet de sécuriser en moyenne plus de 1000 USD par hectare en précision de trésorerie.
 
 - Pour le meilleur modèle, cette erreur est estimée à **273,7 USD/ha**. Le coût n'est pas négligeable selon la taille des champs mais cela reste une estimation et elle est la plus optimisée pour le moment. 
 - C’est très utile pour un exploitant agricole, parce qu’on traduit l’erreur de prédiction en impact financier moyen par hectare. Donc on peut répondre non seulement à “le modèle est-il précis ?”, mais surtout à :
@@ -1088,12 +1089,24 @@ Pour que ce workflow fonctionne, vous devez configurer le secret suivant dans le
 
 - Optimisation : les dépendances sont installées sans interaction (--no-interaction) pour éviter que le runner ne reste bloqué sur une question.
 
-## Perspectives
+## Conclusion 
 
-Les résultats pour la fonction de prédiction et de recommandation sont cohérents par rapport au dataset utilisé, c'est à dire un fichier déséquilibré par type de culture. Actuellement nous sommes capable de donner un rendement par une culture spécifique mais également de propsoer un classement des rendements les plus profitables à partir des conditions climatiques et de la région.
+Ce projet démontre qu’un pipeline MLOps structuré permet de transformer des données agricoles disparates en un outil d’aide à la décision performant. Le modèle Random Forest, avec un R2 global de 0.94, ne se contente pas de prédire des rendements, il capture les dynamiques complexes entre climat, géographie et techniques agricoles.
+
+En traduisant l’erreur statistique en un risque financier en USD/ha, nous sortons du cadre purement mathématique pour parler le langage de l'agriculteur. Le projet prouve ainsi sa valeur ajoutée :
+- réduire l’incertitude de trésorerie de plus de 75 % par rapport à une approche statistique classique (Baseline)
+- sécurisant particulièrement les cultures à haute valeur ajoutée comme l'igname, où l'enjeu financier par tonne est le plus critique.
+- grâce à l’interprétabilité SHAP, on est capable de justifier chaque prédiction.
+
+## Perspectives
 
 Pour aller plus loin nous aurons besoin de pouvoir enrichir nos données de manière plus précise. Actuellement le dataset enrichi n'est pas utilisé car les variables rajoutées n'apportent rien au modèle. Nous avons donc besoin :
 
-- d'éléments similaires à crop_yield mais non synthétique où il serait possible de rapprocher ces informations par région ou pays.
-- avoir des éléments supplémentaires sur les parcelles 
-- d'aller plus loin dans les fonctions de prédiction et de proposer un CA potentiel / ajout d'un prix de vente par pays/région
+- Enrichissement du feature engineering :
+    - Intégrer la composition des sols (pH, nutriments) pour affiner les prédictions certaines cultures qui affichent actuellement une variance plus complexe à expliquer.
+    - Coupler l'API avec des données de télédétection pour monitorer l'état des cultures en temps réel et ajuster les prédictions en cours de saison.
+    - Coupler également avec une API pour avoir des données de pluviométrie en direct
+- Optimisation de l'infrastructure MLOps :
+    - Mettre en place des "Model Drift Alarms" dans MLflow pour déclencher un réentraînement automatique du modèle dès que les conditions climatiques mondiales dérivent trop des données historiques.
+- Expansion de la valeur métier :
+    - Intégration des prix locaux : connecter l'API à des flux de prix régionaux en temps réel pour affiner la métrique économique en fonction des marchés locaux plutôt que des moyennes mondiales de la FAO.

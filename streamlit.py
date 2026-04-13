@@ -3,8 +3,8 @@ import requests
 import pandas as pd
 
 # Configuration des URL
-API_URL_PREDICT = "http://localhost:7860/predict"
-API_URL_RECO = "http://localhost:7860/recommend"
+API_URL_PREDICT = "http://localhost:8000/predict"
+API_URL_RECO = "http://localhost:8000/recommend"
 
 st.set_page_config(page_title="Agritech Predictor", layout="wide")
 
@@ -12,29 +12,29 @@ st.title("🌾 Système de Recommandation Agricole")
 
 # Dictionnaire des infos mape à afficher dans l'encart
 infos_mape = {
-    "Maize": "25,14%",
-    "Potatoes": "14,33%",
-    "Rice": "16.94%",
-    "Wheat": "19,36%",
-    "Sorghum": "25,21%",
-    "Soybean": "21,60%",
-    "Cassava": "18.57%",
-    "Yams": "35,30%",
-    "Sweet potatoes": "21,31%",
-    "Plantains and others": "20,03%"
+    "Maize": "18,45%",
+    "Potatoes": "13,77%",
+    "Rice": "13,07%",
+    "Wheat": "16,79%",
+    "Sorghum": "22,50%",
+    "Soybean": "20,23%",
+    "Cassava": "16,35%",
+    "Yams": "28,40%",
+    "Sweet potatoes": "17,24%",
+    "Plantains and others": "17,46%"
 }
 # Dictionnaire des infos de perte économqiue à afficher dans l'encart
 infos_economic = {
-    "Maize": "173,00 $",
-    "Potatoes": "551.50 $",
-    "Rice": "152,79 $",
-    "Wheat": "78,67 $",
-    "Sorghum": "78,55 $",
-    "Soybean": "91.73 $",
-    "Cassava": "345.05 $",
-    "Yams": "1291.69 $",
-    "Sweet potatoes": "328,36 $",
-    "Plantains and others": "329.39 $"
+    "Maize": "137.09 $",
+    "Potatoes": "547.61 $",
+    "Rice": "123.23 $",
+    "Wheat": "71.89 $",
+    "Sorghum": "71.33 $",
+    "Soybean": "88.31 $",
+    "Cassava": "316.57 $",
+    "Yams": "1244.71 $",
+    "Sweet potatoes": "278.97 $",
+    "Plantains and others": "325.10 $"
 }
 
 # Utilisation d'onglets
